@@ -18,16 +18,16 @@ public class MinecraftLogin {
     private static Boolean isLogged;
     
     // Statement
-    private NuxLauncher _NuxosLauncher;
+	private NuxLauncher launcher;
     
     public MinecraftLogin(NuxLauncher NL) {
-        this._NuxosLauncher = NL;
+        this.launcher = NL;
     }
     
     public boolean login(String username, String password) {
         try {
         	
-          String parameters = "user=" + URLEncoder.encode(username, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + _NuxosLauncher.getMinecraftLauncherVersion();
+          String parameters = "user=" + URLEncoder.encode(username, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + launcher.getMinecraftLauncherVersion();
           String result = Network.executePostSSL("https://login.minecraft.net/", parameters, "minecraft");
           
           if (result == null) {
@@ -59,7 +59,6 @@ public class MinecraftLogin {
           
         } catch (Exception e) {
           e.printStackTrace();
-          System.err.print(e.toString());
           return false;
         }
         return true;
