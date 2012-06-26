@@ -36,11 +36,9 @@ public class ConsolePerformer implements Performer {
 		String password = mainConsole.GetInput();
 		// MainConsole.Log(username + ":" + password);
 		if (logger.login(username, password)) {
-			mainConsole.Log("Successfully logged in player "
-					+ logger.getPseudo());
+			mainConsole.Log("Successfully logged in player " + logger.getPseudo());
 			mainConsole.Log(" - Session ID : " + logger.getSessionId());
-			mainConsole.Log(" - Download ticket : "
-					+ logger.getDownloadTicket());
+			mainConsole.Log(" - Download ticket : " + logger.getDownloadTicket());
 			mainConsole.Log(" - Latest version : " + logger.getLatestVersion());
 		} else {
 			mainConsole.Log("Error, please look logs.");
@@ -49,17 +47,25 @@ public class ConsolePerformer implements Performer {
 
 	public void doUpdate() {
 		try {
-			Downloader.download("http://launcher.nuxos-minecraft.fr/repo.yml",
-					Utils.getWorkingDir().toString() + "/repo.yml");
+			Downloader.download("http://launcher.nuxos-minecraft.fr/repo.yml", Utils.getWorkingDir().toString() + "/repo.yml");
 
 			File repoFile = new File(Utils.getWorkingDir(), "repo.yml");
-			YAMLProcessor repo = new YAMLProcessor(repoFile, false,
-					YAMLFormat.EXTENDED);
+			YAMLProcessor repo = new YAMLProcessor(repoFile, false, YAMLFormat.EXTENDED);
 			repo.load();
-			Updater.processFiles(repo.getNodes("repository.highest"));
-			Updater.processFiles(repo.getNodes("repository.high"));
-			Updater.processFiles(repo.getNodes("repository.normal"));
-			Updater.processFiles(repo.getNodes("repository.optional"));
+
+			YAMLProcessor config = new YAMLProcessor(launcher.getConfig(), false, YAMLFormat.EXTENDED);
+			config.load();
+
+			if (repo.getInt("repository.version") > config.getInt("repository.version", 0)) {
+				Updater.processFiles(repo.getNodes("repository.highest"));
+				Updater.processFiles(repo.getNodes("repository.high"));
+				Updater.processFiles(repo.getNodes("repository.normal"));
+				Updater.processFiles(repo.getNodes("repository.optional"));
+
+				config.setProperty("repository.version", repo.getInt("repository.version"));
+				config.save();
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -1,17 +1,26 @@
 package fr.nuxos.minecraft.NuxLauncher;
 
+import java.io.File;
+
 import fr.nuxos.minecraft.NuxLauncher.console.ConsolePerformer;
 import fr.nuxos.minecraft.NuxLauncher.exceptions.InvalidLauncherModeException;
+import fr.nuxos.minecraft.NuxLauncher.utils.Utils;
 
 public class NuxLauncher {
 
 	static String nuxLauncherVersion = "indev";
 	static Integer minecraftLauncherVersion = 13;
+	static File config;
 
 	private Performer performer;
 
 	public NuxLauncher(String Mode) {
 		try {
+			config = new File(Utils.getWorkingDir(), "config.yml");
+			if (!config.exists()) {
+				config.createNewFile();
+			}
+
 			if (Mode.equals("console")) {
 				performer = new ConsolePerformer(this);
 			} else if (Mode.equals("gui")) {
@@ -32,5 +41,9 @@ public class NuxLauncher {
 
 	public Integer getMinecraftLauncherVersion() {
 		return minecraftLauncherVersion;
+	}
+
+	public File getConfig() {
+		return config;
 	}
 }
