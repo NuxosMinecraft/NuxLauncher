@@ -1,31 +1,75 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>fr.nuxos.minecraft</groupId>
-  <artifactId>nuxlauncher</artifactId>
-  <version>dev-SNAPSHOT</version>
-  <name>NuxLauncher</name>
-  <description>Nuxos Minecraft custom launcher</description>
-  <build>
-    <defaultGoal>clean install</defaultGoal>
-  	<plugins>
-  		<plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-compiler-plugin</artifactId>
-  			<version>2.3.2</version>
-  		</plugin>
-  		<plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-jar-plugin</artifactId>
-  			<version>2.4</version>
-  			<configuration>
-  			    <archive>
-                    <manifest>
-                        <mainClass>fr.nuxos.minecraft.NuxLauncher.Main</mainClass>
-                        <packageName>fr.nuxos.minecraft.NuxLauncher</packageName>
-                    </manifest>
-                </archive>
-            </configuration>
-  		</plugin>
-  	</plugins>
-  </build>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.nuxos.minecraft</groupId>
+	<artifactId>NuxLauncher</artifactId>
+	<version>dev-SNAPSHOT</version>
+	<name>NuxLauncher</name>
+	<description>Nuxos Minecraft custom launcher</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<mainClass>${project.groupId}.${project.artifactId}.Main</mainClass>
+	</properties>
+
+	<scm>
+		<developerConnection>scm:git:git@github.com:NuxosMinecraft/NuxLauncher.git</developerConnection>
+		<connection>scm:git:git://github.com/NuxosMinecraft/NuxLauncher.git</connection>
+		<url>https://github.com/NuxosMinecraft/NuxLauncher</url>
+	</scm>
+
+    <licenses>
+        <license>
+            <name>GNU GENERAL PUBLIC LICENSE Version 3</name>
+            <url>http://www.gnu.org/licenses/gpl.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.10</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<defaultGoal>clean install</defaultGoal>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>${mainClass}</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<minimizeJar>true</minimizeJar>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

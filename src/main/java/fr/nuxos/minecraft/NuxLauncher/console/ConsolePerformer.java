@@ -1,8 +1,17 @@
 package fr.nuxos.minecraft.NuxLauncher.console;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.Performer;
 import fr.nuxos.minecraft.NuxLauncher.minecraft.MinecraftLogin;
+import fr.nuxos.minecraft.NuxLauncher.utils.Downloader;
+import fr.nuxos.minecraft.NuxLauncher.utils.Updater;
+import fr.nuxos.minecraft.NuxLauncher.yml.YAMLFormat;
+import fr.nuxos.minecraft.NuxLauncher.yml.YAMLNode;
+import fr.nuxos.minecraft.NuxLauncher.yml.YAMLProcessor;
 
 public class ConsolePerformer implements Performer {
 
@@ -39,7 +48,21 @@ public class ConsolePerformer implements Performer {
 	}
 
 	public void doUpdate() {
-		// not yet implemented : update game files from a repo
+		try {
+			Downloader.download("http://launcher.nuxos-minecraft.fr/repo.yml",
+					launcher.workingDirectory.toString() + "/repo.yml");
+
+			File repoFile = new File(launcher.workingDirectory, "repo.yml");
+			YAMLProcessor repo = new YAMLProcessor(repoFile, false,
+					YAMLFormat.EXTENDED);
+			repo.load();
+			Updater.processFiles(repo.getNodes("repository.highest"));
+			Updater.processFiles(repo.getNodes("repository.high"));
+			Updater.processFiles(repo.getNodes("repository.normal"));
+			Updater.processFiles(repo.getNodes("repository.optionnal"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void doLaunchMinecraft() {

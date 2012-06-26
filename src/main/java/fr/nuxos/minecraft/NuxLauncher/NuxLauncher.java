@@ -1,5 +1,7 @@
 package fr.nuxos.minecraft.NuxLauncher;
 
+import java.io.File;
+
 import fr.nuxos.minecraft.NuxLauncher.console.ConsolePerformer;
 import fr.nuxos.minecraft.NuxLauncher.exceptions.InvalidLauncherModeException;
 
@@ -9,8 +11,15 @@ public class NuxLauncher {
 	static Integer minecraftLauncherVersion = 13;
 
 	private Performer performer;
+	public final File workingDirectory;
 
 	public NuxLauncher(String Mode) {
+		String userHome = System.getProperty("user.home", ".");
+		workingDirectory = new File(userHome + "/.nuxos/"); //TODO : windows and mac
+
+		if (!workingDirectory.exists()) {
+			workingDirectory.mkdirs();
+		}
 
 		try {
 			if (Mode.equals("console")) {
@@ -23,6 +32,7 @@ public class NuxLauncher {
 
 			performer.doLogin();
 
+			performer.doUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
