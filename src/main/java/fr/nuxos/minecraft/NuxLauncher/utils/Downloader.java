@@ -14,6 +14,7 @@ import java.nio.channels.ReadableByteChannel;
 public class Downloader {
 	public static void download(String inPath, String outPath) {
 		try {
+			System.out.println("DL : " + outPath);
 			URL url = new URL(inPath);
 			URLConnection conn = url.openConnection();
 			conn.setDoInput(true);

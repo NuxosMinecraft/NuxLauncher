@@ -8,6 +8,7 @@ import fr.nuxos.minecraft.NuxLauncher.Performer;
 import fr.nuxos.minecraft.NuxLauncher.minecraft.MinecraftLogin;
 import fr.nuxos.minecraft.NuxLauncher.utils.Downloader;
 import fr.nuxos.minecraft.NuxLauncher.utils.Updater;
+import fr.nuxos.minecraft.NuxLauncher.utils.Utils;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLFormat;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLProcessor;
 
@@ -48,9 +49,9 @@ public class ConsolePerformer implements Performer {
 	public void doUpdate() {
 		try {
 			Downloader.download("http://launcher.nuxos-minecraft.fr/repo.yml",
-					launcher.workingDirectory.toString() + "/repo.yml");
+					Utils.getWorkingDir().toString() + "/repo.yml");
 
-			File repoFile = new File(launcher.workingDirectory, "repo.yml");
+			File repoFile = new File(Utils.getWorkingDir(), "repo.yml");
 			YAMLProcessor repo = new YAMLProcessor(repoFile, false,
 					YAMLFormat.EXTENDED);
 			repo.load();
