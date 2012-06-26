@@ -20,7 +20,7 @@ public class NuxLauncher {
 				throw new InvalidLauncherModeException();
 			}
 
-			performer.doLogin();
+			//performer.doLogin();
 
 			performer.doUpdate();
 		} catch (Exception e) {

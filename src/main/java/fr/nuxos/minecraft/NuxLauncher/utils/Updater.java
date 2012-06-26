@@ -20,8 +20,25 @@ public class Updater {
 			for (String index : files.keySet()) {
 				YAMLNode file = files.get(index);
 				if (file.getString("mode").equalsIgnoreCase("copy")) {
-					Downloader.download(file.getString("source"), Utils.getWorkingDir().toString() + "/" + file.getString("destination"));
+					Downloader.download(file.getString("source").replace("$os$", Utils.getOSName()), Utils.getWorkingDir().toString() + "/" + file.getString("destination"));
 
+					// Extract natives
+					if (file.getString("destination").contains("natives")) {
+						File natives = new File(Utils.getWorkingDir().toString() + "/" + file.getString("destination"));
+						JarInputStream inputStream = new JarInputStream(new FileInputStream(natives));
+
+						ZipEntry entry = inputStream.getNextEntry();
+						while (entry != null) {
+							if (entry.getName().endsWith(".so") || entry.getName().endsWith(".dll") || entry.getName().endsWith("lib")) {
+								FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/bin/natives/" + entry.getName());
+								copyStream(inputStream, outputStream);
+								outputStream.close();
+							}
+							entry = inputStream.getNextEntry();
+						}
+						inputStream.close();
+						natives.delete();
+					}
 				} else if (file.getString("mode").equalsIgnoreCase("jarupdate")) {
 					Downloader.download(file.getString("source"), Utils.getWorkingDir().toString() + "/tmp/" + index);
 
@@ -70,8 +87,7 @@ public class Updater {
 		}
 	}
 
-	static void copyStream(InputStream input, OutputStream output)
-			throws IOException {
+	static void copyStream(InputStream input, OutputStream output) throws IOException {
 		byte[] buffer = new byte[1024];
 		while (true) {
 			int count = input.read(buffer);
