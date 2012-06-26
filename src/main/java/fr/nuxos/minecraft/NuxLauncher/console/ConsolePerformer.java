@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.Performer;
+import fr.nuxos.minecraft.NuxLauncher.launch.GameLauncher;
 import fr.nuxos.minecraft.NuxLauncher.utils.Downloader;
 import fr.nuxos.minecraft.NuxLauncher.utils.MinecraftLogin;
 import fr.nuxos.minecraft.NuxLauncher.utils.Updater;
@@ -65,6 +66,6 @@ public class ConsolePerformer implements Performer {
 	}
 
 	public void doLaunchMinecraft() {
-		// not yet implemented : launches minecraft client
+		GameLauncher.main(logger);
 	}
 }

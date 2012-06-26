@@ -20,9 +20,11 @@ public class NuxLauncher {
 				throw new InvalidLauncherModeException();
 			}
 
-			//performer.doLogin();
+			performer.doLogin();
 
 			performer.doUpdate();
+
+			performer.doLaunchMinecraft();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

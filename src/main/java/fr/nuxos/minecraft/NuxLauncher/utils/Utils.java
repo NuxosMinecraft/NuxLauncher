@@ -23,35 +23,35 @@ public class Utils {
 			operatingSystemName = "windows";
 			String applicationData = System.getenv("APPDATA");
 			if (applicationData != null) {
-				workingDirectory = new File(applicationData, "." + applicationName + '/');
+				workingDirectory = new File(applicationData, "." + applicationName + "/.minecraft/");
 			} else {
-				workingDirectory = new File(userHome, '.' + applicationName + '/');
+				workingDirectory = new File(userHome, '.' + applicationName + "/.minecraft/");
 			}
 		}
 		if (osName.contains("mac")) {
 			operatingSystem = OS.MAC_OS;
 			operatingSystemName = "macosx";
-			workingDirectory = new File(userHome, "Library/Application Support/" + applicationName);
+			workingDirectory = new File(userHome, "Library/Application Support/" + applicationName + "/.minecraft");
 		}
 		if (osName.contains("solaris")) {
 			operatingSystem = OS.SOLARIS;
 			operatingSystemName = "solaris";
-			workingDirectory = new File(userHome, '.' + applicationName + '/');
+			workingDirectory = new File(userHome, '.' + applicationName + "/.minecraft/");
 		}
 		if (osName.contains("sunos")) {
 			operatingSystem = OS.SOLARIS;
 			operatingSystemName = "solaris";
-			workingDirectory = new File(userHome, '.' + applicationName + '/');
+			workingDirectory = new File(userHome, '.' + applicationName + "/.minecraft/");
 		}
 		if (osName.contains("linux")) {
 			operatingSystem = OS.LINUX;
 			operatingSystemName = "linux";
-			workingDirectory = new File(userHome, '.' + applicationName + '/');
+			workingDirectory = new File(userHome, '.' + applicationName + "/.minecraft/");
 		}
 		if (osName.contains("unix")) {
 			operatingSystem = OS.LINUX;
 			operatingSystemName = "linux";
-			workingDirectory = new File(userHome, '.' + applicationName + '/');
+			workingDirectory = new File(userHome, '.' + applicationName + "/.minecraft/");
 		}
 
 		// Create basic dirs
@@ -74,6 +74,8 @@ public class Utils {
 		if (!tmpDirectory.exists()) {
 			tmpDirectory.mkdirs();
 		}
+
+		System.setProperty("user.home", userHome + "/." + applicationName);
 	}
 
 	public static OS getOS() {
