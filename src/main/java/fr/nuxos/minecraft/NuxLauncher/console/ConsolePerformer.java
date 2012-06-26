@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.Performer;
-import fr.nuxos.minecraft.NuxLauncher.minecraft.MinecraftLogin;
 import fr.nuxos.minecraft.NuxLauncher.utils.Downloader;
+import fr.nuxos.minecraft.NuxLauncher.utils.MinecraftLogin;
 import fr.nuxos.minecraft.NuxLauncher.utils.Updater;
 import fr.nuxos.minecraft.NuxLauncher.utils.Utils;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLFormat;
