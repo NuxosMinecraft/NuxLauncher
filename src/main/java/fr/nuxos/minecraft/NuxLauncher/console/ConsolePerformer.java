@@ -2,7 +2,6 @@ package fr.nuxos.minecraft.NuxLauncher.console;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.Performer;
@@ -10,7 +9,6 @@ import fr.nuxos.minecraft.NuxLauncher.minecraft.MinecraftLogin;
 import fr.nuxos.minecraft.NuxLauncher.utils.Downloader;
 import fr.nuxos.minecraft.NuxLauncher.utils.Updater;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLFormat;
-import fr.nuxos.minecraft.NuxLauncher.yml.YAMLNode;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLProcessor;
 
 public class ConsolePerformer implements Performer {
@@ -59,7 +57,7 @@ public class ConsolePerformer implements Performer {
 			Updater.processFiles(repo.getNodes("repository.highest"));
 			Updater.processFiles(repo.getNodes("repository.high"));
 			Updater.processFiles(repo.getNodes("repository.normal"));
-			Updater.processFiles(repo.getNodes("repository.optionnal"));
+			Updater.processFiles(repo.getNodes("repository.optional"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
