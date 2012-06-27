@@ -6,9 +6,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import fr.nuxos.minecraft.NuxLauncher.Main;
 
 public class GameFrame extends JFrame {
 	private static final long serialVersionUID = 5499648340202625650L;
@@ -19,11 +24,13 @@ public class GameFrame extends JFrame {
 		setTitle("Minecraft");
 		setBackground(Color.BLACK);
 
-		/*
-		 * try { InputStream in =
-		 * Launcher.class.getResourceAsStream("/resources/icon.png"); if (in !=
-		 * null) { setIconImage(ImageIO.read(in)); } } catch (IOException e) { }
-		 */
+		try {
+			InputStream in = Main.class.getResourceAsStream("/icon.png");
+			if (in != null) {
+				setIconImage(ImageIO.read(in));
+			}
+		} catch (IOException e) {
+		}
 
 		wrapper = new JPanel();
 		wrapper.setOpaque(false);

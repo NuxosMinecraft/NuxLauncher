@@ -1,17 +1,12 @@
 package fr.nuxos.minecraft.NuxLauncher.console;
 
-import java.io.File;
 import java.io.IOException;
 
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.Performer;
 import fr.nuxos.minecraft.NuxLauncher.launch.GameLauncher;
-import fr.nuxos.minecraft.NuxLauncher.utils.Downloader;
 import fr.nuxos.minecraft.NuxLauncher.utils.MinecraftLogin;
 import fr.nuxos.minecraft.NuxLauncher.utils.Updater;
-import fr.nuxos.minecraft.NuxLauncher.utils.Utils;
-import fr.nuxos.minecraft.NuxLauncher.yml.YAMLFormat;
-import fr.nuxos.minecraft.NuxLauncher.yml.YAMLProcessor;
 
 public class ConsolePerformer implements Performer {
 
@@ -47,25 +42,7 @@ public class ConsolePerformer implements Performer {
 
 	public void doUpdate() {
 		try {
-			Downloader.download("http://launcher.nuxos-minecraft.fr/repo.yml", Utils.getWorkingDir().toString() + "/repo.yml");
-
-			File repoFile = new File(Utils.getWorkingDir(), "repo.yml");
-			YAMLProcessor repo = new YAMLProcessor(repoFile, false, YAMLFormat.EXTENDED);
-			repo.load();
-
-			YAMLProcessor config = new YAMLProcessor(launcher.getConfig(), false, YAMLFormat.EXTENDED);
-			config.load();
-
-			if (repo.getInt("repository.version") > config.getInt("repository.version", 0)) {
-				Updater.processFiles(repo.getNodes("repository.highest"));
-				Updater.processFiles(repo.getNodes("repository.high"));
-				Updater.processFiles(repo.getNodes("repository.normal"));
-				Updater.processFiles(repo.getNodes("repository.optional"));
-
-				config.setProperty("repository.version", repo.getInt("repository.version"));
-				config.save();
-			}
-
+			new Updater();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

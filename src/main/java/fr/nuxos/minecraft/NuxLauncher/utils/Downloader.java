@@ -12,8 +12,19 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
 public class Downloader {
-	public static void download(String inPath, String outPath) {
-		try {
+	private String inPath;
+	private String outPath;
+	private File outFile;
+	int response;
+	int size;
+
+	Downloader(String inPath, String outPath) {
+		this.inPath = inPath;
+		this.outPath = outPath;
+		outFile = null;
+	}
+
+	public void start() throws MalformedURLException, IOException {
 			System.out.println("DL : " + outPath);
 			URL url = new URL(inPath);
 			URLConnection conn = url.openConnection();
@@ -24,24 +35,22 @@ public class Downloader {
 			HttpURLConnection.setFollowRedirects(true);
 			conn.setUseCaches(false);
 			((HttpURLConnection) conn).setInstanceFollowRedirects(true);
-			int response = ((HttpURLConnection) conn).getResponseCode();
+			response = ((HttpURLConnection) conn).getResponseCode();
 			InputStream in = conn.getInputStream();
 
-			int size = conn.getContentLength();
-			File outFile = new File(outPath);
+			size = conn.getContentLength();
+			outFile = new File(outPath);
 			outFile.delete();
 
 			ReadableByteChannel rbc = Channels.newChannel(in);
 			FileOutputStream fos = new FileOutputStream(outFile);
 
-			fos.getChannel().transferFrom(rbc, 0,
-					size > 0 ? size : Integer.MAX_VALUE);
+			fos.getChannel().transferFrom(rbc, 0, size > 0 ? size : Integer.MAX_VALUE);
 			in.close();
 			rbc.close();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	}
+
+	public File getOutFile() {
+		return outFile;
 	}
 }
