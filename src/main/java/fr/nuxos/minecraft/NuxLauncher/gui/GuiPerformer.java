@@ -52,40 +52,14 @@ public class GuiPerformer implements Performer {
 
 	public void doUpdate() {
 		try {
-			Downloader.download("http://launcher.nuxos-minecraft.fr/repo.yml", Utils.getWorkingDir().toString() + "/repo.yml");
-
-			File repoFile = new File(Utils.getWorkingDir(), "repo.yml");
-			YAMLProcessor repo = new YAMLProcessor(repoFile, false, YAMLFormat.EXTENDED);
-			repo.load();
-
-			YAMLProcessor config = new YAMLProcessor(launcher.getConfig(), false, YAMLFormat.EXTENDED);
-			config.load();
-
-			if (repo.getInt("repository.version") > config.getInt("repository.version", 0)) {
-				mainWindow.setStatus("Mise à jour du jeu en cours ...");
-				mainWindow.setProgression(0);
-				Updater.processFiles(repo.getNodes("repository.highest"));
-				Updater.processFiles(repo.getNodes("repository.high"));
-				Updater.processFiles(repo.getNodes("repository.normal"));
-				Updater.processFiles(repo.getNodes("repository.optional"));
-
-				config.setProperty("repository.version", repo.getInt("repository.version"));
-				config.save();
-				mainWindow.setButtonText("Jouer");
-				mainWindow.setStatus("Jeu à jour, prêt à lancer.");
-				mainWindow.setButtonEnabled(true);
-				mainWindow.setProgression(100);
-			}
-			else {
-				mainWindow.setButtonText("Jouer");
-				mainWindow.setStatus("Jeu à jour, prêt à lancer.");
-				mainWindow.setButtonEnabled(true);
-				mainWindow.setProgression(100);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+                  new Updater();
+                  mainWindow.setButtonText("Jouer");
+		  mainWindow.setStatus("Jeu à jour, prêt à lancer.");
+	          mainWindow.setButtonEnabled(true);
+                  mainWindow.setProgression(100);
+                } catch (IOException e) {
+                  e.printStackTrace();
+                }
 	}
 
 	public void doLaunchMinecraft() {
