@@ -5,11 +5,13 @@
 	<artifactId>NuxLauncher</artifactId>
 	<version>dev-SNAPSHOT</version>
 	<name>NuxLauncher</name>
+	<inceptionYear>2012</inceptionYear>
 	<description>Nuxos Minecraft custom launcher</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<mainClass>${project.groupId}.${project.artifactId}.Main</mainClass>
+		<buildNumber>0</buildNumber>
 	</properties>
 
 	<scm>
