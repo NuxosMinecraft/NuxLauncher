@@ -4,6 +4,8 @@ import java.io.File;
 
 import fr.nuxos.minecraft.NuxLauncher.console.ConsolePerformer;
 import fr.nuxos.minecraft.NuxLauncher.exceptions.InvalidLauncherModeException;
+import fr.nuxos.minecraft.NuxLauncher.gui.GuiPerformer;
+import fr.nuxos.minecraft.NuxLauncher.gui.MainFrame;
 import fr.nuxos.minecraft.NuxLauncher.utils.Utils;
 
 public class NuxLauncher {
@@ -23,17 +25,17 @@ public class NuxLauncher {
 
 			if (Mode.equals("console")) {
 				performer = new ConsolePerformer(this);
+				
+				performer.doLogin();
+				performer.doUpdate();
+				performer.doLaunchMinecraft();
+				
 			} else if (Mode.equals("gui")) {
-				// not yet implemented
+				performer = new GuiPerformer(this);
 			} else {
 				throw new InvalidLauncherModeException();
 			}
 
-			performer.doLogin();
-
-			performer.doUpdate();
-
-			performer.doLaunchMinecraft();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -43,7 +45,7 @@ public class NuxLauncher {
 		return minecraftLauncherVersion;
 	}
 
-	public static File getConfig() {
+	public File getConfig() {
 		return config;
 	}
 }

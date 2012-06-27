@@ -95,14 +95,15 @@ public class GameLauncher {
 
 	private static void setLookAndFeel() throws InterruptedException, InvocationTargetException {
 		// Set look and fill
-		SwingUtilities.invokeAndWait(new Runnable() {
-			public void run() {
-				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				} catch (Exception e) {
-				}
-			}
-		});
+		// removed temporarly
+		//SwingUtilities.invokeAndWait(new Runnable() {
+			//public void run() {
+				//try {
+					//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				//} catch (Exception e) {
+				//}
+			//}
+		//});
 	}
 
 	public static void main(MinecraftLogin logger) {
