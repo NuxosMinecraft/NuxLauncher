@@ -45,7 +45,7 @@ public class NuxLauncher {
 		return minecraftLauncherVersion;
 	}
 
-	public File getConfig() {
+	public static File getConfig() {
 		return config;
 	}
 }
