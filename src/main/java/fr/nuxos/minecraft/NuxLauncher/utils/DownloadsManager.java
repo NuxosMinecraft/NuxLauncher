@@ -25,13 +25,6 @@ public class DownloadsManager {
 	public void startDownloads() {
 		iterator = downloadsList.listIterator();
 		startNextDownload();
-		while (downloadsList != null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	private void startNextDownload() {
@@ -58,7 +51,6 @@ public class DownloadsManager {
 	}
 
 	private void downloadsFinished() {
-		downloadsList = null;
 		performer.changeProgress("Installation des fichiers", 0);
 		moveTmpFiles();
 		performer.downloadsFinished();
