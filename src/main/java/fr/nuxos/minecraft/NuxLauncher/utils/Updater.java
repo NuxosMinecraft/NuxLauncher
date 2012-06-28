@@ -84,12 +84,12 @@ public class Updater implements Runnable {
 
 	private String getDestination(final String source, final String destination, final String action) {
 		if (action.equalsIgnoreCase("copy")) {
-			return Utils.getWorkingDir().toString() + "/" + destination;
+			return Utils.getWorkingDir().toString() + "/tmp/" + destination;
 		} else if (action.equalsIgnoreCase("jarupdate")) {
 			String[] out = source.split("/");
 			return Utils.getWorkingDir().toString() + "/tmp/" + out[out.length - 1];
 		} else {
-			return Utils.getWorkingDir().toString() + "/" + destination;
+			return Utils.getWorkingDir().toString() + "/tmp/" + destination;
 		}
 	}
 
@@ -106,7 +106,7 @@ public class Updater implements Runnable {
 				ZipEntry entry = inputStream.getNextEntry();
 				while (entry != null) {
 					if (entry.getName().endsWith(".so") || entry.getName().endsWith(".dll") || entry.getName().endsWith("lib")) {
-						FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/bin/natives/" + entry.getName());
+						FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/tmp/bin/natives/" + entry.getName());
 						IOUtil.copy(inputStream, outputStream);
 						outputStream.close();
 					}
@@ -119,7 +119,7 @@ public class Updater implements Runnable {
 			File dlFile = download.getOutFile();
 
 			// What will contain the new jar
-			File newJar = new File(Utils.getWorkingDir().toString() + "/" + file.getString("destination") + ".tmp");
+			File newJar = new File(Utils.getWorkingDir().toString() + "/tmp/" + file.getString("destination") + ".tmp");
 			JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(newJar));
 
 			// The mod to add
@@ -138,7 +138,7 @@ public class Updater implements Runnable {
 			dlFile.delete();
 
 			// The old jar, e.g. the original minecraft.jar
-			File oldJar = new File(Utils.getWorkingDir().toString() + "/" + file.getString("destination"));
+			File oldJar = new File(Utils.getWorkingDir().toString() + "/tmp/" + file.getString("destination"));
 			JarInputStream oldStream = new JarInputStream(new FileInputStream(oldJar));
 
 			entry = oldStream.getNextEntry();

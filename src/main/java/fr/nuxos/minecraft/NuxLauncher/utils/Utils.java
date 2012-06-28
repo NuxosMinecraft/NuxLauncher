@@ -1,6 +1,7 @@
 package fr.nuxos.minecraft.NuxLauncher.utils;
 
 import java.io.File;
+import java.util.LinkedList;
 
 public class Utils {
 	private static OS operatingSystem;
@@ -58,21 +59,20 @@ public class Utils {
 		if ((!workingDirectory.exists()) && (!workingDirectory.mkdirs())) {
 			throw new RuntimeException("The working directory could not be created: " + workingDirectory);
 		}
-		File binDirectory = new File(workingDirectory, "bin/");
-		if (!binDirectory.exists()) {
-			binDirectory.mkdirs();
-		}
-		File nativesDirectory = new File(workingDirectory, "bin/natives/");
-		if (!nativesDirectory.exists()) {
-			nativesDirectory.mkdirs();
-		}
-		File modsDirectory = new File(workingDirectory, "mods/");
-		if (!modsDirectory.exists()) {
-			modsDirectory.mkdirs();
-		}
-		File tmpDirectory = new File(workingDirectory, "tmp/");
-		if (!tmpDirectory.exists()) {
-			tmpDirectory.mkdirs();
+		
+		LinkedList<File> dirList = new LinkedList<File>();
+		dirList.add(new File(workingDirectory, "bin/"));
+		dirList.add(new File(workingDirectory, "bin/natives/"));
+		dirList.add(new File(workingDirectory, "mods/"));
+		dirList.add(new File(workingDirectory, "tmp/"));
+		dirList.add(new File(workingDirectory, "tmp/bin/"));
+		dirList.add(new File(workingDirectory, "tmp/bin/natives/"));
+		dirList.add(new File(workingDirectory, "tmp/mods/"));
+		
+		for(File dir : dirList) {
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}	
 		}
 	}
 

@@ -1,5 +1,6 @@
 package fr.nuxos.minecraft.NuxLauncher.utils;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -58,6 +59,30 @@ public class DownloadsManager {
 
 	private void downloadsFinished() {
 		downloadsList = null;
+		performer.changeProgress("Installation des fichiers", 0);
+		moveTmpFiles();
 		performer.downloadsFinished();
+	}
+
+	private void moveTmpFiles() {
+		File tmpDir = new File(Utils.getWorkingDir().toString() + "/tmp/");
+		for (File file : tmpDir.listFiles()) {
+			File dest = new File(Utils.getWorkingDir().toString() + "/" + file.getName());
+			removeDirectory(dest);
+			boolean success = file.renameTo(dest); //TODO: error if != true
+		}
+	}
+
+	private void removeDirectory(File directory) {
+		String[] list = directory.list();
+		for (int i = 0; i < list.length; i++) {
+			File entry = new File(directory, list[i]);
+			if (entry.isDirectory()) {
+				removeDirectory(entry);
+			} else {
+				entry.delete();
+			}
+		}
+		directory.delete();
 	}
 }
