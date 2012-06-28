@@ -11,7 +11,6 @@ import java.security.PublicKey;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import fr.nuxos.minecraft.NuxLauncher.Main;
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.exceptions.*;
 
@@ -94,7 +93,7 @@ public class MinecraftLogin {
 			java.security.cert.Certificate[] certs = connection.getServerCertificates();
 
 			byte[] bytes = new byte[294];
-			DataInputStream minecraftCert = new DataInputStream(Main.class.getResourceAsStream("/" + CertifName + ".key"));
+			DataInputStream minecraftCert = new DataInputStream(MinecraftLogin.class.getResourceAsStream("/" + CertifName + ".key"));
 			minecraftCert.readFully(bytes);
 			minecraftCert.close();
 

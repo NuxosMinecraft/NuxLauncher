@@ -1,22 +1,30 @@
 package fr.nuxos.minecraft.NuxLauncher.gui;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
 
-import javax.swing.*;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JProgressBar;
+import javax.swing.JTextField;
 
-import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
+public class MainFrame extends JFrame {
 
-public class MainFrame {
 
+	private static final long serialVersionUID = 8717494428368790716L;
 	// declarations
-	private NuxLauncher launcher;
 	private GuiPerformer performer;
 
 	// GUI elements
-	private static JFrame frame;
 	private static JPanel contentPane;
 	private static JPanel newsPane;
 	private static JLabel backgroundLabel;
@@ -35,20 +43,24 @@ public class MainFrame {
 
 	private static boolean isLogged = false;
 
-	public MainFrame(NuxLauncher launcher, GuiPerformer performer) {
-
-		this.launcher = launcher;
+	public MainFrame(GuiPerformer performer) {
 		this.performer = performer;
 
-		frame = new JFrame("Nuxos Launcher v.indev");
-		frame.setResizable(false);
-		frame.setBounds(100, 100, 854, 480);
-		frame.setDefaultCloseOperation(3);
+		setTitle("Nuxos Launcher v.indev");
+		setResizable(false);
+		setBounds(100, 100, 854, 480);
+		setDefaultCloseOperation(3);
 
-		// frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Windows.class.getResource("icon.png")));
+		try {
+			InputStream in = MainFrame.class.getResourceAsStream("/icon.png");
+			if (in != null) {
+				setIconImage(ImageIO.read(in));
+			}
+		} catch (IOException e) {
+		}
 
 		if (init()) {
-			frame.setVisible(true);
+			setVisible(true);
 		} else {
 
 		}
@@ -67,7 +79,7 @@ public class MainFrame {
 			newsPane.setBackground(new Color(255, 255, 255, 50));
 
 			contentPane.add(newsPane);
-			frame.getContentPane().add(contentPane);
+			getContentPane().add(contentPane);
 
 			// contentPane elements
 			titleLabel = new JLabel("Nuxos Minecraft");
@@ -129,7 +141,7 @@ public class MainFrame {
 			contentPane.add(playButton);
 
 			optionsButton = new JButton("");
-			optionsButton.setIcon(new ImageIcon(MainFrame.class.getResource("cog.png")));
+			optionsButton.setIcon(new ImageIcon(MainFrame.class.getResource("/gui/cog.png")));
 			optionsButton.setToolTipText("Connexion et lancement du jeu. La connexion est faite directement auprès des serveurs de minecraft.net, et est sécurisé ( SSL ). En aucun cas le launcher ne récupère ces informations pour les transmettre à un tiers.");
 			optionsButton.setBounds(596, 418, 30, 30);
 			contentPane.add(optionsButton);
@@ -159,7 +171,7 @@ public class MainFrame {
 
 			backgroundLabel = new JLabel("");
 			backgroundLabel.setForeground(Color.WHITE);
-			backgroundLabel.setIcon(new ImageIcon(MainFrame.class.getResource("bg.png")));
+			backgroundLabel.setIcon(new ImageIcon(MainFrame.class.getResource("/gui/bg.png")));
 			backgroundLabel.setBounds(0, 0, 854, 480);
 			contentPane.add(backgroundLabel);
 
@@ -217,7 +229,7 @@ public class MainFrame {
 	}
 
 	public void setVisibleFrame(boolean visible) {
-		frame.setVisible(visible);
+		setVisible(visible);
 	}
 
 }

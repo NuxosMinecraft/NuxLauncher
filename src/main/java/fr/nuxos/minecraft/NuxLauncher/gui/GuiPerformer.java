@@ -19,7 +19,7 @@ public class GuiPerformer implements Performer {
 	public GuiPerformer(NuxLauncher MainLauncher) {
 		// Loading main classes
 		launcher = MainLauncher;
-		mainWindow = new MainFrame(launcher, this);
+		mainWindow = new MainFrame(this);
 		logger = new MinecraftLogin(launcher);
 	}
 
