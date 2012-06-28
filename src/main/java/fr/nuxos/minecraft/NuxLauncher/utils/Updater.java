@@ -21,7 +21,7 @@ import fr.nuxos.minecraft.NuxLauncher.yml.YAMLNode;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLProcessor;
 
 public class Updater implements Runnable {
-	private YAMLProcessor config;
+	private static YAMLProcessor config;
 	private static YAMLProcessor repo;
 	private DownloadsManager dlManager;
 	private Performer performer;
@@ -49,9 +49,6 @@ public class Updater implements Runnable {
 				updateOptional("repository.optional");
 
 				dlManager.startDownloads();
-
-				config.setProperty("repository.version", repo.getInt("repository.version"));
-				config.save();
 			} else {
 				performer.downloadsFinished();
 			}
@@ -157,5 +154,10 @@ public class Updater implements Runnable {
 			oldJar.delete();
 			newJar.renameTo(oldJar);
 		}
+	}
+
+	public static void downloadsFinished() {
+		config.setProperty("repository.version", repo.getInt("repository.version"));
+		config.save();
 	}
 }

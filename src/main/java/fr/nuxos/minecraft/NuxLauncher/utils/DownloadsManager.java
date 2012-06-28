@@ -53,6 +53,7 @@ public class DownloadsManager {
 	private void downloadsFinished() {
 		performer.changeProgress("Installation des fichiers", 0);
 		moveTmpFiles();
+		Updater.downloadsFinished();
 		performer.downloadsFinished();
 	}
 
