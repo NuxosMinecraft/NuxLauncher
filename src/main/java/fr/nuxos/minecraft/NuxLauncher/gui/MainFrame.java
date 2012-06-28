@@ -3,9 +3,22 @@ package fr.nuxos.minecraft.NuxLauncher.gui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.PBEParameterSpec;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,8 +30,9 @@ import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
-public class MainFrame extends JFrame {
+import fr.nuxos.minecraft.NuxLauncher.utils.Utils;
 
+public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 8717494428368790716L;
 	// declarations
@@ -125,8 +139,7 @@ public class MainFrame extends JFrame {
 				@SuppressWarnings("deprecation")
 				public void actionPerformed(ActionEvent arg0) {
 					if (isLogged == false) {
-						if (passField.getText().isEmpty()
-								|| userField.getText().isEmpty()) {
+						if (passField.getText().isEmpty() || userField.getText().isEmpty()) {
 							// set status "retry", removed ( useless )
 						} else {
 							performer.doLogin();
@@ -184,6 +197,7 @@ public class MainFrame extends JFrame {
 
 			newsPane.add(titleNewsLabel);
 
+			readRemember();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -228,4 +242,61 @@ public class MainFrame extends JFrame {
 		isLogged = logged;
 	}
 
+	private void readRemember() {
+		try {
+			File lastLogin = new File(Utils.getWorkingDir(), "lastlogin");
+			if (!lastLogin.exists()) {
+				return;
+			}
+
+			Cipher cipher = getCipher(2, "passwordfile");
+
+			DataInputStream dis;
+			if (cipher != null) {
+				dis = new DataInputStream(new CipherInputStream(new FileInputStream(lastLogin), cipher));
+			} else {
+				dis = new DataInputStream(new FileInputStream(lastLogin));
+			}
+
+			userField.setText(dis.readUTF());
+			passField.setText(dis.readUTF());
+			rememberCheckBox.setSelected(passField.getPassword().length > 0);
+			dis.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void writeRemember() {
+		try {
+			File lastLogin = new File(Utils.getWorkingDir(), "lastlogin");
+
+			Cipher cipher = getCipher(1, "passwordfile");
+
+			DataOutputStream dos;
+			if (cipher != null)
+				dos = new DataOutputStream(new CipherOutputStream(new FileOutputStream(lastLogin), cipher));
+			else {
+				dos = new DataOutputStream(new FileOutputStream(lastLogin));
+			}
+
+			dos.writeUTF(userField.getText());
+			dos.writeUTF(rememberCheckBox.isSelected() ? new String(passField.getPassword()) : "");
+			dos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private final static Cipher getCipher(int mode, String password) throws Exception {
+		Random random = new Random(43287234L);
+		byte[] salt = new byte[8];
+		random.nextBytes(salt);
+		PBEParameterSpec pbeParamSpec = new PBEParameterSpec(salt, 5);
+
+		SecretKey pbeKey = SecretKeyFactory.getInstance("PBEWithMD5AndDES").generateSecret(new PBEKeySpec(password.toCharArray()));
+		Cipher cipher = Cipher.getInstance("PBEWithMD5AndDES");
+		cipher.init(mode, pbeKey, pbeParamSpec);
+		return cipher;
+	}
 }

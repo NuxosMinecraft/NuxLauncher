@@ -61,6 +61,7 @@ public class GuiPerformer implements Performer {
 	}
 	
 	public void authFinishedSuccess(Hashtable<String, String> loggingInfo) {
+		mainWindow.writeRemember();
 		this.loggingInfo = loggingInfo;
 		mainWindow.setStatus("Bienvenue, " + loggingInfo.get("username") + "."); //TODO: can't see. Add button update or remove that
 		mainWindow.setLogged(true);
