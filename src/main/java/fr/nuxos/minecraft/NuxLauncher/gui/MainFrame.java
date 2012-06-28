@@ -228,8 +228,4 @@ public class MainFrame extends JFrame {
 		isLogged = logged;
 	}
 
-	public void setVisibleFrame(boolean visible) {
-		setVisible(visible);
-	}
-
 }
