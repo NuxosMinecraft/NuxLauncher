@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import javax.swing.JOptionPane;
+
 import fr.nuxos.minecraft.NuxLauncher.Performer;
 
 public class DownloadsManager {
@@ -57,12 +59,25 @@ public class DownloadsManager {
 		performer.downloadsFinished();
 	}
 
+	public void downloadFailed(String reason, Downloader download) {
+		String[] options = { "Abandonner les téléchargements", "Recommencer le téléchargement" };
+		int answer = JOptionPane.showOptionDialog(null, "Erreur : " + reason, "Erreur de téléchargement pour " + download.getName(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		if (answer == 0) {
+			removeDirectory(new File(Utils.getWorkingDir().toString() + "/tmp/"));
+			performer.downloadsFinished();
+		} else {
+			Thread t = new Thread(download);
+			t.start();
+			performer.changeProgress("Téléchargement de " + download.getName(), 0);
+		}
+	}
+
 	private void moveTmpFiles() {
 		File tmpDir = new File(Utils.getWorkingDir().toString() + "/tmp/");
 		for (File file : tmpDir.listFiles()) {
 			File dest = new File(Utils.getWorkingDir().toString() + "/" + file.getName());
 			removeDirectory(dest);
-			boolean success = file.renameTo(dest); //TODO: error if != true
+			boolean success = file.renameTo(dest); // TODO: error if != true
 		}
 	}
 

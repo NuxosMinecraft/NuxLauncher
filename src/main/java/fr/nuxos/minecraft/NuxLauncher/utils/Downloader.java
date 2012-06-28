@@ -66,15 +66,21 @@ public class Downloader implements Runnable {
 				}
 			}).start();
 		} catch (MalformedURLException e) {
+			manager.downloadFailed("erreur inconnue. regarder les logs et contacter un administrateur.", download);
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			manager.downloadFailed("fichier non trouvé " + e.getMessage(), download);
 			e.printStackTrace();
 		} catch (IOException e) {
+			manager.downloadFailed("erreur inconnue. regarder les logs et contacter un administrateur.", download);
 			e.printStackTrace();
 		} catch (BadMd5Exception e) {
+			manager.downloadFailed("mauvais md5.", download);
 			e.printStackTrace();
-		} // TODO : error message on GUI
+		}
 	}
 
-	public void start() throws MalformedURLException, IOException {
+	public void start() throws MalformedURLException, FileNotFoundException, IOException {
 		URL url = new URL(inPath);
 		URLConnection conn = url.openConnection();
 		conn.setDoInput(true);

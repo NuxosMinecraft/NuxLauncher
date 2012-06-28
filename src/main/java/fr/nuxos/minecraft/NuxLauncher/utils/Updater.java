@@ -31,6 +31,17 @@ public class Updater implements Runnable {
 	}
 
 	public void run() {
+		dlManager = new DownloadsManager(performer);
+
+		updateAll("repository.highest");
+		updateAll("repository.high");
+		updateAll("repository.normal");
+		updateOptional("repository.optional");
+
+		dlManager.startDownloads();
+	}
+
+	public boolean checkForUpdate() {
 		try {
 			Downloader repoDL = new Downloader("http://launcher.nuxos-minecraft.fr/repo.yml", Utils.getWorkingDir().toString() + "/repo.yml");
 			repoDL.start();
@@ -39,24 +50,19 @@ public class Updater implements Runnable {
 			repo.load();
 
 			config = NuxLauncher.getConfig();
-
 			if (repo.getInt("repository.version") > config.getInt("repository.version", 0)) {
-				dlManager = new DownloadsManager(performer);
-
-				updateAll("repository.highest");
-				updateAll("repository.high");
-				updateAll("repository.normal");
-				updateOptional("repository.optional");
-
-				dlManager.startDownloads();
+				return true;
 			} else {
-				performer.downloadsFinished();
+				return false;
 			}
 		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	private void updateAll(String path) {

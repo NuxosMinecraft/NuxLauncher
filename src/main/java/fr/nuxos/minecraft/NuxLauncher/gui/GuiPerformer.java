@@ -28,15 +28,20 @@ public class GuiPerformer implements Performer {
 	public void doLogin() {
 		mainWindow.setProgressBarView(true);
 		mainWindow.setButtonEnabled(false);
-		Thread t = new Thread(new MinecraftLogin(launcher, this, mainWindow.getUsername(), mainWindow.getPassword())); //TODO: handle download errors
+		Thread t = new Thread(new MinecraftLogin(launcher, this, mainWindow.getUsername(), mainWindow.getPassword()));
 		t.start();
 	}
 
 	public void doUpdate() {
-		mainWindow.setButtonText("Mise à jour ...");
-		mainWindow.setButtonEnabled(false);
-		Thread t = new Thread(new Updater(this)); //TODO: handle download errors
-		t.start();
+		Updater updater = new Updater(this);
+		if(updater.checkForUpdate()) {
+			mainWindow.setButtonText("Mise à jour ...");
+			mainWindow.setButtonEnabled(false);
+			Thread t = new Thread(new Updater(this));
+			t.start();
+		} else {
+			downloadsFinished();
+		}
 	}
 
 	public void doLaunchMinecraft() {
