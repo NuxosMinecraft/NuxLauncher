@@ -6,4 +6,8 @@ public interface Performer {
 	public void doUpdate();
 
 	public void doLaunchMinecraft();
+
+	public void changeProgress(String status, int progress);
+
+	public void downloadsFinished();
 }

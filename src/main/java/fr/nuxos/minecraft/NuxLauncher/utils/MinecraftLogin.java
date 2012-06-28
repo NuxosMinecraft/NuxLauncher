@@ -11,6 +11,7 @@ import java.security.PublicKey;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import fr.nuxos.minecraft.NuxLauncher.Main;
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.exceptions.*;
 
@@ -35,11 +36,8 @@ public class MinecraftLogin {
 	public boolean login(String username, String password) {
 		try {
 
-			String parameters = "user=" + URLEncoder.encode(username, "UTF-8")
-					+ "&password=" + URLEncoder.encode(password, "UTF-8")
-					+ "&version=" + launcher.getMinecraftLauncherVersion();
-			String result = executePostSSL(
-					"https://login.minecraft.net/", parameters, "minecraft");
+			String parameters = "user=" + URLEncoder.encode(username, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + launcher.getMinecraftLauncherVersion();
+			String result = executePostSSL("https://login.minecraft.net/", parameters, "minecraft");
 
 			if (result == null) {
 				throw new MCNetworkException();
@@ -52,12 +50,10 @@ public class MinecraftLogin {
 					throw new OutdatedMCLauncherException();
 				} else if (result.trim().contains("User not premium")) {
 					throw new MinecraftUserNotPremiumException();
-				} else if (result.trim().contains(
-						"Account migrated, use e-mail as username.")) {
+				} else if (result.trim().contains("Account migrated, use e-mail as username.")) {
 					throw new AccountMigratedException();
 				} else {
-					System.err.print("Unknown login result : \"" + result
-							+ "\"");
+					System.err.print("Unknown login result : \"" + result + "\"");
 				}
 
 			}
@@ -77,8 +73,7 @@ public class MinecraftLogin {
 		return true;
 	}
 
-	public static String executePostSSL(String targetURL, String urlParameters,
-			String CertifName) {
+	public static String executePostSSL(String targetURL, String urlParameters, String CertifName) {
 
 		HttpsURLConnection connection = null;
 
@@ -87,10 +82,8 @@ public class MinecraftLogin {
 
 			connection = (HttpsURLConnection) url.openConnection();
 			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded");
-			connection.setRequestProperty("Content-Length",
-					Integer.toString(urlParameters.getBytes().length));
+			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			connection.setRequestProperty("Content-Length", Integer.toString(urlParameters.getBytes().length));
 			// connection.setRequestProperty("Content-Language", "en-US");
 			// useless
 			connection.setUseCaches(false);
@@ -98,12 +91,10 @@ public class MinecraftLogin {
 			connection.setDoOutput(true);
 			connection.connect();
 
-			java.security.cert.Certificate[] certs = connection
-					.getServerCertificates();
+			java.security.cert.Certificate[] certs = connection.getServerCertificates();
 
 			byte[] bytes = new byte[294];
-			DataInputStream minecraftCert = new DataInputStream(
-					MinecraftLogin.class.getResourceAsStream(CertifName + ".key"));
+			DataInputStream minecraftCert = new DataInputStream(Main.class.getResourceAsStream("/" + CertifName + ".key"));
 			minecraftCert.readFully(bytes);
 			minecraftCert.close();
 
@@ -117,8 +108,7 @@ public class MinecraftLogin {
 				throw new RuntimeException("Error : key mismatch !");
 			}
 
-			DataOutputStream wr = new DataOutputStream(
-					connection.getOutputStream());
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 			wr.writeBytes(urlParameters);
 			wr.flush();
 			wr.close();

@@ -1,7 +1,5 @@
 package fr.nuxos.minecraft.NuxLauncher.console;
 
-import java.io.IOException;
-
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.Performer;
 import fr.nuxos.minecraft.NuxLauncher.launch.GameLauncher;
@@ -41,14 +39,16 @@ public class ConsolePerformer implements Performer {
 	}
 
 	public void doUpdate() {
-		try {
-			new Updater();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new Updater(this);
 	}
 
 	public void doLaunchMinecraft() {
 		GameLauncher.main(logger);
+	}
+
+	public void changeProgress(String status, int progress) {
+	}
+
+	public void downloadsFinished() {
 	}
 }

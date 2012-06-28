@@ -33,11 +33,28 @@
 		</license>
 	</licenses>
 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>osxappbundle-maven-plugin</id>
+			<url>http://openshapa.org/maven2</url>
+		</pluginRepository>
+	</pluginRepositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 			<version>1.10</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>20041127.091804</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>20030203.000550</version>
 		</dependency>
 	</dependencies>
 
@@ -103,7 +120,7 @@
 									<goal>launch4j</goal>
 								</goals>
 								<configuration>
-									<headerType>console</headerType>
+									<headerType>gui</headerType>
 									<stayAlive>false</stayAlive>
 									<singleInstance>
 										<mutexName>${project.name}</mutexName>
@@ -147,7 +164,7 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>osxappbundle-maven-plugin</artifactId>
-						<version>1.0-alpha-2</version>
+						<version>1.0-alpha-3</version>
 						<executions>
 							<execution>
 								<phase>package</phase>
@@ -161,17 +178,18 @@
 							<bundleName>${project.name}</bundleName>
 							<version>${project.version}</version>
 							<iconFile>${basedir}/src/main/resources/app/icon.icns</iconFile>
+							<!--<dictionaryFile>${basedir}/src/main/resources/app/Info.plist.template</dictionaryFile>-->
 							<javaApplicationStub>${basedir}/src/main/resources/app/JavaApplicationStub</javaApplicationStub>
 							<zipFile>${project.build.directory}/${project.build.finalName}.zip</zipFile>
 							<jvmVersion>1.5+</jvmVersion>
 							<vmOptions>-Xms512M -Xmx1024M -Xdock:name=Spoutcraft -Xdock:icon="icon.icns"</vmOptions>
-							<additionalResources>
+							<!--<additionalResources>
 								<fileSet>
 									<directory>${basedir}</directory>
-									<!--<includes> <include>LICENSE.txt</include> </includes> -->
+									<includes> <include>LICENSE.txt</include> </includes>
 								</fileSet>
-							</additionalResources>
-							<excludeArtifactIds>commons-codec,commons-io,jdom</excludeArtifactIds>
+							</additionalResources>-->
+							<!--<excludeArtifactIds>commons-codec,commons-io,jdom</excludeArtifactIds>-->
 						</configuration>
 					</plugin>
 				</plugins>

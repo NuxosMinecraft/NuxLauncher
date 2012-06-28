@@ -5,104 +5,137 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.jar.JarOutputStream;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 
+import org.apache.commons.io.IOUtil;
+
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
+import fr.nuxos.minecraft.NuxLauncher.Performer;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLFormat;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLNode;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLProcessor;
 
-public class Updater {
+public class Updater implements Runnable {
 	private YAMLProcessor config;
+	private static YAMLProcessor repo;
+	private DownloadsManager dlManager;
+	private Performer performer;
 
-	public Updater() throws IOException {
-		Downloader repoDL = new Downloader("http://launcher.nuxos-minecraft.fr/repo.yml", Utils.getWorkingDir().toString() + "/repo.yml");
-		repoDL.start();
+	public Updater(Performer performer) {
+		this.performer = performer;
+	}
 
-		YAMLProcessor repo = new YAMLProcessor(repoDL.getOutFile(), false, YAMLFormat.EXTENDED);
-		repo.load();
+	public void run() {
+		try {
+			Downloader repoDL = new Downloader("http://launcher.nuxos-minecraft.fr/repo.yml", Utils.getWorkingDir().toString() + "/repo.yml");
+			repoDL.start();
 
-		config = new YAMLProcessor(NuxLauncher.getConfig(), false, YAMLFormat.EXTENDED);
-		config.load();
+			repo = new YAMLProcessor(repoDL.getOutFile(), false, YAMLFormat.EXTENDED);
+			repo.load();
 
-		if (repo.getInt("repository.version") > config.getInt("repository.version", 0)) {
-			updateAll(repo.getNodes("repository.highest"));
-			updateAll(repo.getNodes("repository.high"));
-			updateAll(repo.getNodes("repository.normal"));
-			updateOptional(repo.getNodes("repository.optional"));
+			config = NuxLauncher.getConfig();
 
-			config.setProperty("repository.version", repo.getInt("repository.version"));
-			config.save();
+			if (repo.getInt("repository.version") > config.getInt("repository.version", 0)) {
+				dlManager = new DownloadsManager(performer);
+
+				updateAll("repository.highest");
+				updateAll("repository.high");
+				updateAll("repository.normal");
+				updateOptional("repository.optional");
+
+				dlManager.startDownloads();
+
+				config.setProperty("repository.version", repo.getInt("repository.version"));
+				config.save();
+			} else {
+				performer.downloadsFinished();
+			}
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
-	private void updateAll(Map<String, YAMLNode> files) throws FileNotFoundException, IOException {
+	private void updateAll(String path) {
+		Map<String, YAMLNode> files = repo.getNodes(path);
 		for (String index : files.keySet()) {
 			YAMLNode file = files.get(index);
-			updateFile(file);
+			String destination = getDestination(file.getString("source"), file.getString("destination"), file.getString("mode"));
+			dlManager.addDownload(file.getString("source"), destination, file.getString("md5"), file.getString("name"), path + "." + index);
 		}
 	}
 
-	private void updateOptional(Map<String, YAMLNode> files) throws IOException {
+	private void updateOptional(String path) {
+		Map<String, YAMLNode> files = repo.getNodes(path);
 		for (String index : files.keySet()) {
 			YAMLNode file = files.get(index);
 			if (config.getBoolean("optional." + index + ".enabled", false)) {
-				updateFile(file);
+				String destination = getDestination(file.getString("source"), file.getString("destination"), file.getString("mode"));
+				dlManager.addDownload(file.getString("source"), destination, file.getString("md5"), file.getString("name"), path + "." + index);
 			}
 		}
 	}
 
-	private static void updateFile(YAMLNode file) throws FileNotFoundException, IOException {
+	private String getDestination(final String source, final String destination, final String action) {
+		if (action.equalsIgnoreCase("copy")) {
+			return Utils.getWorkingDir().toString() + "/" + destination;
+		} else if (action.equalsIgnoreCase("jarupdate")) {
+			String[] out = source.split("/");
+			return Utils.getWorkingDir().toString() + "/tmp/" + out[out.length - 1];
+		} else {
+			return Utils.getWorkingDir().toString() + "/" + destination;
+		}
+	}
+
+	public static void doAction(Downloader download) throws FileNotFoundException, IOException {
+		YAMLNode file = repo.getNode(download.getDownloadId());
+
 		if (file.getString("mode").equalsIgnoreCase("copy")) {
-			Downloader fileDL = new Downloader(file.getString("source").replace("$os$", Utils.getOSName()), Utils.getWorkingDir().toString() + "/" + file.getString("destination"));
-			fileDL.start();
+			File dlFile = download.getOutFile();
 
 			// Extract natives
 			if (file.getString("destination").contains("natives")) {
-				JarInputStream inputStream = new JarInputStream(new FileInputStream(fileDL.getOutFile()));
+				JarInputStream inputStream = new JarInputStream(new FileInputStream(dlFile));
 
 				ZipEntry entry = inputStream.getNextEntry();
 				while (entry != null) {
 					if (entry.getName().endsWith(".so") || entry.getName().endsWith(".dll") || entry.getName().endsWith("lib")) {
 						FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/bin/natives/" + entry.getName());
-						copyStream(inputStream, outputStream);
+						IOUtil.copy(inputStream, outputStream);
 						outputStream.close();
 					}
 					entry = inputStream.getNextEntry();
 				}
 				inputStream.close();
-				fileDL.getOutFile().delete();
+				dlFile.delete();
 			}
 		} else if (file.getString("mode").equalsIgnoreCase("jarupdate")) {
-			String[] out = file.getString("source").split("/");
-			Downloader fileDL = new Downloader(file.getString("source"), Utils.getWorkingDir().toString() + "/tmp/" + out[out.length - 1]);
-			fileDL.start();
+			File dlFile = download.getOutFile();
 
 			// What will contain the new jar
 			File newJar = new File(Utils.getWorkingDir().toString() + "/" + file.getString("destination") + ".tmp");
 			JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(newJar));
 
 			// The mod to add
-			File tmpJar = fileDL.getOutFile();
-			JarInputStream inputStream = new JarInputStream(new FileInputStream(tmpJar));
+			JarInputStream inputStream = new JarInputStream(new FileInputStream(dlFile));
 
 			ArrayList<String> list = new ArrayList<String>();
 
 			ZipEntry entry = inputStream.getNextEntry();
 			while (entry != null) {
 				outputStream.putNextEntry(new ZipEntry(entry.getName()));
-				copyStream(inputStream, outputStream);
+				IOUtil.copy(inputStream, outputStream);
 				list.add(entry.getName());
 				entry = inputStream.getNextEntry();
 			}
 			inputStream.close();
-			tmpJar.delete();
+			dlFile.delete();
 
 			// The old jar, e.g. the original minecraft.jar
 			File oldJar = new File(Utils.getWorkingDir().toString() + "/" + file.getString("destination"));
@@ -112,7 +145,7 @@ public class Updater {
 			while (entry != null) {
 				if (!list.contains(entry.getName())) {
 					outputStream.putNextEntry(new ZipEntry(entry.getName()));
-					copyStream(oldStream, outputStream);
+					IOUtil.copy(oldStream, outputStream);
 				}
 				entry = oldStream.getNextEntry();
 			}
@@ -123,17 +156,6 @@ public class Updater {
 
 			oldJar.delete();
 			newJar.renameTo(oldJar);
-		}
-	}
-
-	static void copyStream(InputStream input, OutputStream output) throws IOException {
-		byte[] buffer = new byte[1024];
-		while (true) {
-			int count = input.read(buffer);
-			if (count < 0) {
-				break;
-			}
-			output.write(buffer, 0, count);
 		}
 	}
 }
