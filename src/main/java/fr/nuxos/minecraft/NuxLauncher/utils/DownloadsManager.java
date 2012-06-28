@@ -1,10 +1,13 @@
 package fr.nuxos.minecraft.NuxLauncher.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
+
+import org.apache.commons.io.FileUtils;
 
 import fr.nuxos.minecraft.NuxLauncher.Performer;
 
@@ -63,7 +66,7 @@ public class DownloadsManager {
 		String[] options = { "Abandonner les téléchargements", "Recommencer le téléchargement" };
 		int answer = JOptionPane.showOptionDialog(null, "Erreur : " + reason, "Erreur de téléchargement pour " + download.getName(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 		if (answer == 0) {
-			removeDirectory(new File(Utils.getWorkingDir().toString() + "/tmp/"));
+			FileUtils.deleteQuietly(new File(Utils.getWorkingDir().toString() + "/tmp/"));
 			performer.downloadsFinished();
 		} else {
 			Thread t = new Thread(download);
@@ -76,21 +79,8 @@ public class DownloadsManager {
 		File tmpDir = new File(Utils.getWorkingDir().toString() + "/tmp/");
 		for (File file : tmpDir.listFiles()) {
 			File dest = new File(Utils.getWorkingDir().toString() + "/" + file.getName());
-			removeDirectory(dest);
+			FileUtils.deleteQuietly(dest);
 			boolean success = file.renameTo(dest); // TODO: error if != true
 		}
-	}
-
-	private void removeDirectory(File directory) {
-		String[] list = directory.list();
-		for (int i = 0; i < list.length; i++) {
-			File entry = new File(directory, list[i]);
-			if (entry.isDirectory()) {
-				removeDirectory(entry);
-			} else {
-				entry.delete();
-			}
-		}
-		directory.delete();
 	}
 }

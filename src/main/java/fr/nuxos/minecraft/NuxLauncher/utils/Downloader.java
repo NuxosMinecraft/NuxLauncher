@@ -14,7 +14,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtil;
+import org.apache.commons.io.IOUtils;
 
 import fr.nuxos.minecraft.NuxLauncher.exceptions.BadMd5Exception;
 
@@ -128,7 +128,7 @@ public class Downloader implements Runnable {
 		}
 
 		FileInputStream fis = new FileInputStream(outFile);
-		String foundMd5 = DigestUtils.md5Hex(IOUtil.toByteArray(fis));
+		String foundMd5 = DigestUtils.md5Hex(IOUtils.toByteArray(fis));
 		fis.close();
 
 		if (!exceptedMd5.equalsIgnoreCase(foundMd5)) {

@@ -12,7 +12,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 
-import org.apache.commons.io.IOUtil;
+import org.apache.commons.io.IOUtils;
 
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.Performer;
@@ -110,7 +110,7 @@ public class Updater implements Runnable {
 				while (entry != null) {
 					if (entry.getName().endsWith(".so") || entry.getName().endsWith(".dll") || entry.getName().endsWith("lib")) {
 						FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/tmp/bin/natives/" + entry.getName());
-						IOUtil.copy(inputStream, outputStream);
+						IOUtils.copy(inputStream, outputStream);
 						outputStream.close();
 					}
 					entry = inputStream.getNextEntry();
@@ -133,7 +133,7 @@ public class Updater implements Runnable {
 			ZipEntry entry = inputStream.getNextEntry();
 			while (entry != null) {
 				outputStream.putNextEntry(new ZipEntry(entry.getName()));
-				IOUtil.copy(inputStream, outputStream);
+				IOUtils.copy(inputStream, outputStream);
 				list.add(entry.getName());
 				entry = inputStream.getNextEntry();
 			}
@@ -148,7 +148,7 @@ public class Updater implements Runnable {
 			while (entry != null) {
 				if (!list.contains(entry.getName())) {
 					outputStream.putNextEntry(new ZipEntry(entry.getName()));
-					IOUtil.copy(oldStream, outputStream);
+					IOUtils.copy(oldStream, outputStream);
 				}
 				entry = oldStream.getNextEntry();
 			}
