@@ -10,4 +10,8 @@ public interface Performer {
 	public void changeProgress(String status, int progress);
 
 	public void downloadsFinished();
+	
+	public void authFinishedSuccess(String[] logged_infos);
+	
+	public void authFinishedFail(String reason);
 }

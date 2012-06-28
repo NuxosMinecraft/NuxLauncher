@@ -106,7 +106,7 @@ public class GameLauncher {
 		//});
 	}
 
-	public static void main(MinecraftLogin logger) {
+	public static void main(String[] logged_infos) {
 
 		try {
 			setLookAndFeel();
@@ -114,8 +114,8 @@ public class GameLauncher {
 			GameLauncher launcher = new GameLauncher();
 			launcher.setWindowDim(new Dimension(854, 480));
 			launcher.setParameter("stand-alone", "true");
-			launcher.setParameter("username", logger.getPseudo());
-			launcher.setParameter("sessionid", logger.getSessionId());
+			launcher.setParameter("username", logged_infos[2]);
+			launcher.setParameter("sessionid", logged_infos[3]);
 
 			launcher.launch();
 		} catch (final LaunchException t) {

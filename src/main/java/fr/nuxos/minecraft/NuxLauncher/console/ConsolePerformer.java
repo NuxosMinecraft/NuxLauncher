@@ -12,13 +12,13 @@ public class ConsolePerformer implements Performer {
 	ConsoleRender mainConsole;
 	NuxLauncher launcher;
 	// Minecraft
-	MinecraftLogin logger;
+	String[] logged_infos;
 
 	public ConsolePerformer(NuxLauncher MainLauncher) {
 		// Loading main classes
 		mainConsole = new ConsoleRender();
 		launcher = MainLauncher;
-		logger = new MinecraftLogin(launcher);
+		//logger = new MinecraftLogin(launcher);
 	}
 
 	public void doLogin() {
@@ -28,14 +28,14 @@ public class ConsolePerformer implements Performer {
 		mainConsole.Log("Password :");
 		String password = mainConsole.GetInput();
 		// MainConsole.Log(username + ":" + password);
-		if (logger.login(username, password)) {
-			mainConsole.Log("Successfully logged in player " + logger.getPseudo());
-			mainConsole.Log(" - Session ID : " + logger.getSessionId());
-			mainConsole.Log(" - Download ticket : " + logger.getDownloadTicket());
-			mainConsole.Log(" - Latest version : " + logger.getLatestVersion());
-		} else {
+		//if (logger.login(username, password)) {
+			mainConsole.Log("Successfully logged in player " + logged_infos[2]);
+			mainConsole.Log(" - Session ID : " + logged_infos[3]);
+			mainConsole.Log(" - Download ticket : " + logged_infos[1]);
+			mainConsole.Log(" - Latest version : " + logged_infos[0]);
+		//} else {
 			mainConsole.Log("Error, please look logs.");
-		}
+		//}
 	}
 
 	public void doUpdate() {
@@ -43,12 +43,21 @@ public class ConsolePerformer implements Performer {
 	}
 
 	public void doLaunchMinecraft() {
-		GameLauncher.main(logger);
+		GameLauncher.main(logged_infos);
 	}
 
 	public void changeProgress(String status, int progress) {
 	}
 
 	public void downloadsFinished() {
+	}
+
+	public void authFinishedSuccess(String[] logged_infos) {
+		this.logged_infos = logged_infos;
+	}
+
+	public void authFinishedFail(String reason) {
+		// TODO Auto-generated method stub
+		
 	}
 }

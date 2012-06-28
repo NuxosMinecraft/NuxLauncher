@@ -12,64 +12,99 @@ import java.security.PublicKey;
 import javax.net.ssl.HttpsURLConnection;
 
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
+import fr.nuxos.minecraft.NuxLauncher.Performer;
 import fr.nuxos.minecraft.NuxLauncher.exceptions.*;
 
-public class MinecraftLogin {
+public class MinecraftLogin implements Runnable {
 
+	// Logging infos
+	private static String userName;
+	private static String password;
+	
 	// Logged infos
-	private static String latestVersion;
-	private static String downloadTicket;
-	private static String sessionId;
-	private static String pseudo;
-
+	/*
+	private static String latestVersion;    -> logged_infos[0]
+	private static String downloadTicket;   -> logged_infos[1]
+	private static String sessionId;        -> logged_infos[3]
+	private static String pseudo;           -> logged_infos[2]
+	*/
+	public String[] logged_infos = new String[4];
+	
 	// State
 	private static Boolean isLogged;
 
 	// Statement
 	private NuxLauncher launcher;
+	private Performer performer;
 
-	public MinecraftLogin(NuxLauncher NL) {
+	public MinecraftLogin(NuxLauncher NL, Performer performer, String username, String password) {
 		this.launcher = NL;
+		this.performer = performer;
+		this.userName = username;
+		this.password = password;
+	}
+	
+
+	public void run() {
+		if(userName.isEmpty() || password.isEmpty()) {
+			performer.authFinishedFail("Champs incomplets");
+		}
+		else {
+			performer.changeProgress("Logging in ...", 0);
+			login();
+		}
+		
 	}
 
-	public boolean login(String username, String password) {
+	
+	private void login() {
 		try {
 
-			String parameters = "user=" + URLEncoder.encode(username, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + launcher.getMinecraftLauncherVersion();
+			String parameters = "user=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + launcher.getMinecraftLauncherVersion();
+			performer.changeProgress("Connexion à minecraft.net ...", 10);
 			String result = executePostSSL("https://login.minecraft.net/", parameters, "minecraft");
 
 			if (result == null) {
-				throw new MCNetworkException();
+				performer.authFinishedFail("Can't connect");
+				throw new MCNetworkException();		
 			}
 
 			if (!result.contains(":")) {
 				if (result.trim().equals("Bad login")) {
+					performer.authFinishedFail("Bad login");
 					throw new BadLoginException();
 				} else if (result.trim().equals("Old version")) {
+					performer.authFinishedFail("Outdated version.");
 					throw new OutdatedMCLauncherException();
 				} else if (result.trim().contains("User not premium")) {
+					performer.authFinishedFail("User not premium");
 					throw new MinecraftUserNotPremiumException();
 				} else if (result.trim().contains("Account migrated, use e-mail as username.")) {
+					performer.authFinishedFail("Use you email instead");
 					throw new AccountMigratedException();
 				} else {
+					performer.authFinishedFail("Unknown error");
 					System.err.print("Unknown login result : \"" + result + "\"");
 				}
 
 			}
+			
+			performer.changeProgress("Lecture des données ...", 50);
+			
 			String[] values = result.split(":");
 
-			pseudo = values[2].trim();
-			latestVersion = values[0].trim();
-			downloadTicket = values[1].trim();
-			sessionId = values[3].trim();
+			logged_infos[2] = values[2].trim();
+			logged_infos[0] = values[0].trim();
+			logged_infos[1] = values[1].trim();
+			logged_infos[3] = values[3].trim();
 
 			isLogged = true;
-
+			
+			performer.authFinishedSuccess(logged_infos);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
 		}
-		return true;
+
 	}
 
 	public static String executePostSSL(String targetURL, String urlParameters, String CertifName) {
@@ -134,26 +169,4 @@ public class MinecraftLogin {
 			}
 		}
 	}
-
-	// GetSet
-	public boolean isLogged() {
-		return isLogged;
-	}
-
-	public String getLatestVersion() {
-		return latestVersion;
-	}
-
-	public String getDownloadTicket() {
-		return downloadTicket;
-	}
-
-	public String getSessionId() {
-		return sessionId;
-	}
-
-	public String getPseudo() {
-		return pseudo;
-	}
-
 }
