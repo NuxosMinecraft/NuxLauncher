@@ -1,5 +1,7 @@
 package fr.nuxos.minecraft.NuxLauncher;
 
+import java.util.Hashtable;
+
 public interface Performer {
 	public void doLogin();
 
@@ -11,7 +13,7 @@ public interface Performer {
 
 	public void downloadsFinished();
 	
-	public void authFinishedSuccess(String[] logged_infos);
+	public void authFinishedSuccess(Hashtable<String, String> loggingInfo);
 	
 	public void authFinishedFail(String reason);
 }

@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.PublicKey;
+import java.util.Hashtable;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -16,91 +17,70 @@ import fr.nuxos.minecraft.NuxLauncher.Performer;
 import fr.nuxos.minecraft.NuxLauncher.exceptions.*;
 
 public class MinecraftLogin implements Runnable {
-
-	// Logging infos
-	private static String userName;
-	private static String password;
-	
-	// Logged infos
-	/*
-	private static String latestVersion;    -> logged_infos[0]
-	private static String downloadTicket;   -> logged_infos[1]
-	private static String sessionId;        -> logged_infos[3]
-	private static String pseudo;           -> logged_infos[2]
-	*/
-	public String[] logged_infos = new String[4];
-	
-	// State
-	private static Boolean isLogged;
-
-	// Statement
 	private NuxLauncher launcher;
 	private Performer performer;
+	private String username;
+	private String password;
+	public Hashtable<String, String> loggingInfo;
 
-	public MinecraftLogin(NuxLauncher NL, Performer performer, String username, String password) {
-		this.launcher = NL;
+	public MinecraftLogin(NuxLauncher launcher, Performer performer, String username, String password) {
+		this.launcher = launcher;
 		this.performer = performer;
-		this.userName = username;
+		this.username = username;
 		this.password = password;
 	}
-	
 
 	public void run() {
-		if(userName.isEmpty() || password.isEmpty()) {
+		if (username.isEmpty() || password.isEmpty()) {
 			performer.authFinishedFail("Champs incomplets");
-		}
-		else {
-			performer.changeProgress("Logging in ...", 0);
+		} else {
+			performer.changeProgress("Authentification ...", 0);
 			login();
 		}
-		
 	}
 
-	
 	private void login() {
 		try {
 
-			String parameters = "user=" + URLEncoder.encode(userName, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + launcher.getMinecraftLauncherVersion();
+			String parameters = "user=" + URLEncoder.encode(username, "UTF-8") + "&password=" + URLEncoder.encode(password, "UTF-8") + "&version=" + launcher.getMinecraftLauncherVersion();
 			performer.changeProgress("Connexion à minecraft.net ...", 10);
 			String result = executePostSSL("https://login.minecraft.net/", parameters, "minecraft");
 
 			if (result == null) {
 				performer.authFinishedFail("Can't connect");
-				throw new MCNetworkException();		
+				throw new MCNetworkException();
 			}
 
 			if (!result.contains(":")) {
 				if (result.trim().equals("Bad login")) {
-					performer.authFinishedFail("Bad login");
+					performer.authFinishedFail("mauvais username/password");
 					throw new BadLoginException();
 				} else if (result.trim().equals("Old version")) {
-					performer.authFinishedFail("Outdated version.");
+					performer.authFinishedFail("version trop vieille");
 					throw new OutdatedMCLauncherException();
 				} else if (result.trim().contains("User not premium")) {
-					performer.authFinishedFail("User not premium");
+					performer.authFinishedFail("compte non payé");
 					throw new MinecraftUserNotPremiumException();
 				} else if (result.trim().contains("Account migrated, use e-mail as username.")) {
-					performer.authFinishedFail("Use you email instead");
+					performer.authFinishedFail("utilisez votre adresse e-mail");
 					throw new AccountMigratedException();
 				} else {
-					performer.authFinishedFail("Unknown error");
+					performer.authFinishedFail("erreur inconnue");
 					System.err.print("Unknown login result : \"" + result + "\"");
 				}
+			} else {
+				performer.changeProgress("Lecture des données ...", 50);
 
+				String[] values = result.split(":");
+
+				loggingInfo = new Hashtable<String, String>();
+				loggingInfo.put("username", values[2].trim());
+				loggingInfo.put("latestversion", values[0].trim());
+				loggingInfo.put("downloadticket", values[1].trim());
+				loggingInfo.put("sessionid", values[3].trim());
+
+				performer.authFinishedSuccess(loggingInfo);
 			}
-			
-			performer.changeProgress("Lecture des données ...", 50);
-			
-			String[] values = result.split(":");
-
-			logged_infos[2] = values[2].trim();
-			logged_infos[0] = values[0].trim();
-			logged_infos[1] = values[1].trim();
-			logged_infos[3] = values[3].trim();
-
-			isLogged = true;
-			
-			performer.authFinishedSuccess(logged_infos);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

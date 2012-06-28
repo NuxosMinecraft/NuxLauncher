@@ -1,5 +1,7 @@
 package fr.nuxos.minecraft.NuxLauncher.console;
 
+import java.util.Hashtable;
+
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.Performer;
 import fr.nuxos.minecraft.NuxLauncher.launch.GameLauncher;
@@ -12,7 +14,7 @@ public class ConsolePerformer implements Performer {
 	ConsoleRender mainConsole;
 	NuxLauncher launcher;
 	// Minecraft
-	String[] logged_infos;
+	Hashtable<String, String> loggingInfo;
 
 	public ConsolePerformer(NuxLauncher MainLauncher) {
 		// Loading main classes
@@ -29,10 +31,10 @@ public class ConsolePerformer implements Performer {
 		String password = mainConsole.GetInput();
 		// MainConsole.Log(username + ":" + password);
 		//if (logger.login(username, password)) {
-			mainConsole.Log("Successfully logged in player " + logged_infos[2]);
-			mainConsole.Log(" - Session ID : " + logged_infos[3]);
-			mainConsole.Log(" - Download ticket : " + logged_infos[1]);
-			mainConsole.Log(" - Latest version : " + logged_infos[0]);
+			mainConsole.Log("Successfully logged in player " + loggingInfo.get("username"));
+			mainConsole.Log(" - Session ID : " + loggingInfo.get("sessionid"));
+			mainConsole.Log(" - Download ticket : " + loggingInfo.get("downloadticket"));
+			mainConsole.Log(" - Latest version : " + loggingInfo.get("latestversion"));
 		//} else {
 			mainConsole.Log("Error, please look logs.");
 		//}
@@ -43,7 +45,7 @@ public class ConsolePerformer implements Performer {
 	}
 
 	public void doLaunchMinecraft() {
-		GameLauncher.main(logged_infos);
+		GameLauncher.main(loggingInfo);
 	}
 
 	public void changeProgress(String status, int progress) {
@@ -52,8 +54,8 @@ public class ConsolePerformer implements Performer {
 	public void downloadsFinished() {
 	}
 
-	public void authFinishedSuccess(String[] logged_infos) {
-		this.logged_infos = logged_infos;
+	public void authFinishedSuccess(Hashtable<String, String> loggingInfo) {
+		this.loggingInfo = loggingInfo;
 	}
 
 	public void authFinishedFail(String reason) {

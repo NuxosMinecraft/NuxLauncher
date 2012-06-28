@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import fr.nuxos.minecraft.NuxLauncher.exceptions.LaunchException;
-import fr.nuxos.minecraft.NuxLauncher.utils.MinecraftLogin;
 import fr.nuxos.minecraft.NuxLauncher.utils.Utils;
 
 public class GameLauncher {
@@ -94,28 +94,26 @@ public class GameLauncher {
 	}
 
 	private static void setLookAndFeel() throws InterruptedException, InvocationTargetException {
-		// Set look and fill
-		// removed temporarly
-		//SwingUtilities.invokeAndWait(new Runnable() {
-			//public void run() {
-				//try {
-					//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				//} catch (Exception e) {
-				//}
-			//}
-		//});
+		SwingUtilities.invokeAndWait(new Runnable() {
+			public void run() {
+				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch (Exception e) {
+				}
+			}
+		});
 	}
 
-	public static void main(String[] logged_infos) {
+	public static void main(Hashtable<String, String> loggingInfo) {
 
 		try {
-			setLookAndFeel();
+			// setLookAndFeel();
 
 			GameLauncher launcher = new GameLauncher();
 			launcher.setWindowDim(new Dimension(854, 480));
 			launcher.setParameter("stand-alone", "true");
-			launcher.setParameter("username", logged_infos[2]);
-			launcher.setParameter("sessionid", logged_infos[3]);
+			launcher.setParameter("username", loggingInfo.get("username"));
+			launcher.setParameter("sessionid", loggingInfo.get("sessionid"));
 
 			launcher.launch();
 		} catch (final LaunchException t) {

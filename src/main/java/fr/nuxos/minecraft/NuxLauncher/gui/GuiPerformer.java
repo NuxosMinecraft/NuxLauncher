@@ -1,5 +1,7 @@
 package fr.nuxos.minecraft.NuxLauncher.gui;
 
+import java.util.Hashtable;
+
 import javax.swing.SwingUtilities;
 
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
@@ -14,7 +16,7 @@ public class GuiPerformer implements Performer {
 	MainFrame mainWindow;
 	NuxLauncher launcher;
 	// Minecraft
-    String[] logged_infos;
+    Hashtable<String, String> loggingInfo;
 
 	public GuiPerformer(NuxLauncher MainLauncher) {
 		// Loading main classes
@@ -38,7 +40,7 @@ public class GuiPerformer implements Performer {
 	}
 
 	public void doLaunchMinecraft() {
-		GameLauncher.main(logged_infos); //TODO: close window when minecraft is launched
+		GameLauncher.main(loggingInfo); //TODO: close window when minecraft is launched
 	}
 
 	public void changeProgress(final String status, final int progress) {
@@ -57,16 +59,16 @@ public class GuiPerformer implements Performer {
 		mainWindow.setProgression(100);
 	}
 	
-	public void authFinishedSuccess(String[] logged_infos) {
-		this.logged_infos = logged_infos;
-		mainWindow.setStatus("Bienvenue, " + logged_infos[2] + "."); //TODO: can't see. Add button update or remove that
+	public void authFinishedSuccess(Hashtable<String, String> loggingInfo) {
+		this.loggingInfo = loggingInfo;
+		mainWindow.setStatus("Bienvenue, " + loggingInfo.get("username") + "."); //TODO: can't see. Add button update or remove that
 		mainWindow.setLogged(true);
 		doUpdate();
 	}
 	
 	public void authFinishedFail(String reason) {
 		mainWindow.setButtonEnabled(true);
-		mainWindow.setStatus("Erreur lors de la connexion : " + reason + ". Réessayer."); //TODO: reask login
+		mainWindow.setStatus("Erreur lors de la connexion : " + reason + ". Réessayez.");
 		mainWindow.setProgression(0);
 	}
 }
