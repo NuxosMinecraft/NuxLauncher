@@ -40,6 +40,7 @@ public class GuiPerformer implements Performer {
 	}
 
 	public void doLaunchMinecraft() {
+		mainWindow.setVisible(false);
 		GameLauncher.main(loggingInfo); //TODO: close window when minecraft is launched
 	}
 

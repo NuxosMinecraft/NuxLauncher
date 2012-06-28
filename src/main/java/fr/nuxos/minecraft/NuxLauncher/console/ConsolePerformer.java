@@ -17,31 +17,25 @@ public class ConsolePerformer implements Performer {
 	Hashtable<String, String> loggingInfo;
 
 	public ConsolePerformer(NuxLauncher MainLauncher) {
-		// Loading main classes
 		mainConsole = new ConsoleRender();
 		launcher = MainLauncher;
-		//logger = new MinecraftLogin(launcher);
+		doLogin();
 	}
 
 	public void doLogin() {
-		mainConsole.Log("Please login ( minecraft.net, SSL secured ) :");
+
 		mainConsole.Log("Username :");
 		String username = mainConsole.GetInput();
 		mainConsole.Log("Password :");
 		String password = mainConsole.GetInput();
-		// MainConsole.Log(username + ":" + password);
-		//if (logger.login(username, password)) {
-			mainConsole.Log("Successfully logged in player " + loggingInfo.get("username"));
-			mainConsole.Log(" - Session ID : " + loggingInfo.get("sessionid"));
-			mainConsole.Log(" - Download ticket : " + loggingInfo.get("downloadticket"));
-			mainConsole.Log(" - Latest version : " + loggingInfo.get("latestversion"));
-		//} else {
-			mainConsole.Log("Error, please look logs.");
-		//}
+		
+		Thread t = new Thread(new MinecraftLogin(launcher, this, username, password)); //TODO: handle download errors
+		t.start();
 	}
 
 	public void doUpdate() {
-		new Updater(this);
+		Thread t = new Thread(new Updater(this)); //TODO: handle download errors
+		t.start();
 	}
 
 	public void doLaunchMinecraft() {
@@ -49,17 +43,27 @@ public class ConsolePerformer implements Performer {
 	}
 
 	public void changeProgress(String status, int progress) {
+		mainConsole.Log(status + " " + progress + "%");
 	}
 
 	public void downloadsFinished() {
+		mainConsole.Log("Update done, launching game ...");	
+		doLaunchMinecraft();
 	}
 
 	public void authFinishedSuccess(Hashtable<String, String> loggingInfo) {
 		this.loggingInfo = loggingInfo;
+		
+		mainConsole.Log("Successfully logged in player " + loggingInfo.get("username"));
+		mainConsole.Log(" - Session ID : " + loggingInfo.get("sessionid"));
+		mainConsole.Log(" - Download ticket : " + loggingInfo.get("downloadticket"));
+		mainConsole.Log(" - Latest version : " + loggingInfo.get("latestversion"));
+
+		doUpdate();
 	}
 
 	public void authFinishedFail(String reason) {
-		// TODO Auto-generated method stub
-		
+		mainConsole.Log("Login failed, please retry : " + reason);	
+		doLogin();
 	}
 }

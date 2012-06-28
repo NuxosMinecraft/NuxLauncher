@@ -10,6 +10,6 @@ public class Main {
 		// TODO : args
 
 		Utils.init("nuxos");
-		launcher = new NuxLauncher("gui");
+		launcher = new NuxLauncher("console");
 	}
 }

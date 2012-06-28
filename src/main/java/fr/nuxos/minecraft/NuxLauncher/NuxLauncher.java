@@ -28,11 +28,6 @@ public class NuxLauncher {
 
 			if (Mode.equals("console")) {
 				performer = new ConsolePerformer(this);
-
-				performer.doLogin();
-				performer.doUpdate();
-				performer.doLaunchMinecraft();
-
 			} else if (Mode.equals("gui")) {
 				performer = new GuiPerformer(this);
 			} else {
