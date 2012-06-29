@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JToggleButton;
 import javax.swing.table.AbstractTableModel;
 
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
@@ -28,7 +29,10 @@ public class ConfigurationFrame extends JFrame {
 	private static JTable table;
 	private JButton saveButton;
 	private JButton cancelButton;
+	private JToggleButton forceUpdateButton;
 	private Hashtable<String, Object[]> optionalList;
+	private boolean forceUpdate;
+	private boolean modsUpdate;
 
 	private ConfigurationFrame() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -61,16 +65,18 @@ public class ConfigurationFrame extends JFrame {
 		saveButton.setEnabled(false);
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				YAMLProcessor config = NuxLauncher.getConfig();
-				config.removeProperty("optional");
+				if (forceUpdate || modsUpdate) {
+					YAMLProcessor config = NuxLauncher.getConfig();
+					config.removeProperty("optional");
 
-				Enumeration<Object[]> e = optionalList.elements();
-				while (e.hasMoreElements()) {
-					Object[] current = e.nextElement();
-					config.setProperty("optional." + (String) current[1] + ".enabled", data.elementAt((Integer) current[0]).elementAt(3));
+					Enumeration<Object[]> e = optionalList.elements();
+					while (e.hasMoreElements()) {
+						Object[] current = e.nextElement();
+						config.setProperty("optional." + (String) current[1] + ".enabled", data.elementAt((Integer) current[0]).elementAt(3));
+					}
+					config.setProperty("repository.version", 0);
+					config.save();
 				}
-				config.setProperty("repository.version", 0);
-				config.save();
 
 				frame.dispose();
 			}
@@ -83,8 +89,17 @@ public class ConfigurationFrame extends JFrame {
 			}
 		});
 
+		forceUpdateButton = new JToggleButton("Forcer la mise à jour");
+		forceUpdateButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				forceUpdate = forceUpdateButton.isEnabled();
+				saveButton.setEnabled(true);
+			}
+		});
+
 		buttonsPanel.add(saveButton);
 		buttonsPanel.add(cancelButton);
+		buttonsPanel.add(forceUpdateButton);
 
 		this.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
 		this.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
@@ -172,6 +187,7 @@ public class ConfigurationFrame extends JFrame {
 				} else if (table.getValueAt(row, column).toString().equalsIgnoreCase("false")) {
 					aValue = new Boolean(true);
 					saveButton.setEnabled(true);
+					modsUpdate = true;
 				}
 			}
 
