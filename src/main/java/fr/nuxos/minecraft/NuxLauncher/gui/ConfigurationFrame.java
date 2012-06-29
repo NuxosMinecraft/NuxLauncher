@@ -50,6 +50,9 @@ public class ConfigurationFrame extends JFrame {
 
 		ZModel model = new ZModel(data, titles);
 		table = new JTable(model);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		TableColumnAdjuster tca = new TableColumnAdjuster(table);
+		tca.adjustColumns();
 
 		JPanel buttonsPanel = new JPanel();
 
