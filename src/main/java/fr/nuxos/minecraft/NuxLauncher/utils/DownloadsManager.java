@@ -66,7 +66,11 @@ public class DownloadsManager {
 		String[] options = { "Abandonner les téléchargements", "Recommencer le téléchargement" };
 		int answer = JOptionPane.showOptionDialog(null, "Erreur : " + reason, "Erreur de téléchargement pour " + download.getName(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 		if (answer == 0) {
-			FileUtils.deleteQuietly(new File(Utils.getWorkingDir().toString() + "/tmp/"));
+			try {
+				FileUtils.deleteDirectory(new File(Utils.getWorkingDir().toString() + "/tmp/"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			performer.downloadsFinished();
 		} else {
 			Thread t = new Thread(download);
@@ -79,8 +83,18 @@ public class DownloadsManager {
 		File tmpDir = new File(Utils.getWorkingDir().toString() + "/tmp/");
 		for (File file : tmpDir.listFiles()) {
 			File dest = new File(Utils.getWorkingDir().toString() + "/" + file.getName());
-			FileUtils.deleteQuietly(dest);
-			boolean success = file.renameTo(dest); // TODO: error if != true
+			if (file.isDirectory()) {
+				try {
+					FileUtils.deleteDirectory(dest);
+					FileUtils.moveDirectory(file, dest);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				// should only have bin dir and mods dir to move
+				FileUtils.deleteQuietly(file);
+				FileUtils.deleteQuietly(dest);
+			}
 		}
 	}
 }
