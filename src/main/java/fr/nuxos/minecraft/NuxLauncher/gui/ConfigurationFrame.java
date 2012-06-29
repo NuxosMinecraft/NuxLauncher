@@ -1,6 +1,8 @@
 package fr.nuxos.minecraft.NuxLauncher.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
@@ -23,7 +25,7 @@ public class ConfigurationFrame extends JFrame {
 	private static final long serialVersionUID = -8510556813877211562L;
 
 	private static ConfigurationFrame frame;
-	private JTable table;
+	private static JTable table;
 	private JButton saveButton;
 	private JButton cancelButton;
 	private Hashtable<String, Object[]> optionalList;
@@ -31,7 +33,6 @@ public class ConfigurationFrame extends JFrame {
 	private ConfigurationFrame() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Configuration");
-		setSize(854, 480);
 		setLocationRelativeTo(null);
 
 		optionalList = new Hashtable<String, Object[]>();
@@ -50,7 +51,7 @@ public class ConfigurationFrame extends JFrame {
 
 		ZModel model = new ZModel(data, titles);
 		table = new JTable(model);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		TableColumnAdjuster tca = new TableColumnAdjuster(table);
 		tca.adjustColumns();
 
@@ -92,6 +93,11 @@ public class ConfigurationFrame extends JFrame {
 	public static void main() {
 		frame = new ConfigurationFrame();
 		frame.setVisible(true);
+
+		int width = table.getWidth() + frame.getInsets().left + frame.getInsets().right;
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setBounds((dim.width - width) / 2, (dim.height - 480) / 2, width, 480);
+
 	}
 
 	private void fillArray(Vector<Vector<Object>> data, String path, boolean optional) {

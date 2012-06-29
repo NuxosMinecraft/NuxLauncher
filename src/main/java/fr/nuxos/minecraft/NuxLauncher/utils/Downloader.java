@@ -100,26 +100,31 @@ public class Downloader implements Runnable {
 		ReadableByteChannel rbc = Channels.newChannel(in);
 		FileOutputStream fos = new FileOutputStream(outFile);
 
-		Thread t = new Thread() {
-			public void run() {
-				boolean running = true;
-				while (running) {
-					try {
-						downloaded = outFile.length();
-						Thread.sleep(100);
-						manager.updateProgress(download);
-					} catch (InterruptedException e) {
-						running = false;
+		Thread t = null;
+		if (manager != null) {
+			t = new Thread() {
+				public void run() {
+					boolean running = true;
+					while (running) {
+						try {
+							downloaded = outFile.length();
+							Thread.sleep(100);
+							manager.updateProgress(download);
+						} catch (InterruptedException e) {
+							running = false;
+						}
 					}
 				}
-			}
-		};
-		t.start();
+			};
+			t.start();
+		}
 
 		fos.getChannel().transferFrom(rbc, 0, size > 0 ? size : Integer.MAX_VALUE);
 		in.close();
 		rbc.close();
-		t.interrupt();
+		if (manager != null) {
+			t.interrupt();
+		}
 	}
 
 	public void checkMD5() throws BadMd5Exception, IOException {

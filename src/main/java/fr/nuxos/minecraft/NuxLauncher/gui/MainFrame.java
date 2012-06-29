@@ -1,6 +1,8 @@
 package fr.nuxos.minecraft.NuxLauncher.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -62,8 +64,10 @@ public class MainFrame extends JFrame {
 
 		setTitle("Nuxos Launcher v.indev");
 		setResizable(false);
-		setBounds(100, 100, 854, 480);
-		setDefaultCloseOperation(3);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		setBounds((dim.width - 854) / 2, (dim.height - 480) / 2, 854, 480);
 
 		try {
 			InputStream in = MainFrame.class.getResourceAsStream("/icon.png");
