@@ -44,7 +44,7 @@ public class ConfigurationFrame extends JFrame {
 
 		Vector<String> titles = new Vector<String>();
 		titles.add("Nom");
-		titles.add("Decription");
+		titles.add("Description");
 		titles.add("Version");
 		titles.add("Installation");
 
