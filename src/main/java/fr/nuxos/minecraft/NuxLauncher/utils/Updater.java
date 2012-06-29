@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.jar.JarOutputStream;
@@ -16,7 +15,6 @@ import org.apache.commons.io.IOUtils;
 
 import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.Performer;
-import fr.nuxos.minecraft.NuxLauncher.yml.YAMLFormat;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLNode;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLProcessor;
 
@@ -42,27 +40,15 @@ public class Updater implements Runnable {
 	}
 
 	public boolean checkForUpdate() {
-		try {
-			Downloader repoDL = new Downloader("http://launcher.nuxos-minecraft.fr/repo.yml", Utils.getWorkingDir().toString() + "/repo.yml");
-			repoDL.start();
+		repo = NuxLauncher.getRepo();
+		config = NuxLauncher.getConfig();
 
-			repo = new YAMLProcessor(repoDL.getOutFile(), false, YAMLFormat.EXTENDED);
-			repo.load();
-
-			config = NuxLauncher.getConfig();
-			if (repo.getInt("repository.version") > config.getInt("repository.version", 0)) {
-				return true;
-			} else {
-				return false;
-			}
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (repo.getInt("repository.version") > config.getInt("repository.version", 0)) {
+			return true;
+		} else {
+			return false;
 		}
-		return false;
+
 	}
 
 	private void updateAll(String path) {

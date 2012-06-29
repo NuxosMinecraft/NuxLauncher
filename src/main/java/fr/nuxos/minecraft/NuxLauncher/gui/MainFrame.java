@@ -157,6 +157,13 @@ public class MainFrame extends JFrame {
 			optionsButton.setIcon(new ImageIcon(MainFrame.class.getResource("/gui/cog.png")));
 			optionsButton.setToolTipText("Connexion et lancement du jeu. La connexion est faite directement auprès des serveurs de minecraft.net, et est sécurisé ( SSL ). En aucun cas le launcher ne récupère ces informations pour les transmettre à un tiers.");
 			optionsButton.setBounds(596, 418, 30, 30);
+
+			optionsButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					ConfigurationFrame.main();
+				}
+			});
+
 			contentPane.add(optionsButton);
 
 			rememberCheckBox = new JCheckBox();
