@@ -184,6 +184,7 @@ public class ConfigurationFrame extends JFrame {
 				if (table.getValueAt(row, column).toString().equalsIgnoreCase("true")) {
 					aValue = new Boolean(false);
 					saveButton.setEnabled(true);
+					modsUpdate = true;
 				} else if (table.getValueAt(row, column).toString().equalsIgnoreCase("false")) {
 					aValue = new Boolean(true);
 					saveButton.setEnabled(true);
