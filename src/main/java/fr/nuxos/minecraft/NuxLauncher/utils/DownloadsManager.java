@@ -22,7 +22,7 @@ public class DownloadsManager {
 	}
 
 	public void addDownload(String source, String dest, String md5, String name, String downloadId) {
-		Downloader download = new Downloader(source.replace("$os$", Utils.getOSName()), dest, md5, downloadId, name, this);
+		Downloader download = new Downloader(source, dest, md5, downloadId, name, this);
 
 		downloadsList.add(download);
 	}

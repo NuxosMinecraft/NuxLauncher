@@ -55,8 +55,8 @@ public class Updater implements Runnable {
 		Map<String, YAMLNode> files = repo.getNodes(path);
 		for (String index : files.keySet()) {
 			YAMLNode file = files.get(index);
-			String destination = getDestination(file.getString("source"), file.getString("destination"), file.getString("mode"));
-			dlManager.addDownload(file.getString("source"), destination, file.getString("md5"), file.getString("name"), path + "." + index);
+			String destination = getDestination(file.getString("source").replace("$os$", Utils.getOSName()), file.getString("destination"), file.getString("mode"));
+			dlManager.addDownload(file.getString("source").replace("$os$", Utils.getOSName()), destination, file.getString("md5"), file.getString("name"), path + "." + index);
 		}
 	}
 
@@ -65,8 +65,8 @@ public class Updater implements Runnable {
 		for (String index : files.keySet()) {
 			YAMLNode file = files.get(index);
 			if (config.getBoolean("optional." + index + ".enabled", false)) {
-				String destination = getDestination(file.getString("source"), file.getString("destination"), file.getString("mode"));
-				dlManager.addDownload(file.getString("source"), destination, file.getString("md5"), file.getString("name"), path + "." + index);
+				String destination = getDestination(file.getString("source").replace("$os$", Utils.getOSName()), file.getString("destination"), file.getString("mode"));
+				dlManager.addDownload(file.getString("source").replace("$os$", Utils.getOSName()), destination, file.getString("md5"), file.getString("name"), path + "." + index);
 			}
 		}
 	}
@@ -74,6 +74,9 @@ public class Updater implements Runnable {
 	private String getDestination(final String source, final String destination, final String action) {
 		if (action.equalsIgnoreCase("copy")) {
 			return Utils.getWorkingDir().toString() + "/tmp/" + destination;
+		} else if (action.equalsIgnoreCase("extract")) {
+			String[] out = source.split("/");
+			return Utils.getWorkingDir().toString() + "/tmp/" + out[out.length - 1];
 		} else if (action.equalsIgnoreCase("jarupdate")) {
 			String[] out = source.split("/");
 			return Utils.getWorkingDir().toString() + "/tmp/" + out[out.length - 1];
@@ -86,24 +89,26 @@ public class Updater implements Runnable {
 		YAMLNode file = repo.getNode(download.getDownloadId());
 
 		if (file.getString("mode").equalsIgnoreCase("copy")) {
+			// Nothing to do
+		} else if (file.getString("mode").equalsIgnoreCase("extract")) {
 			File dlFile = download.getOutFile();
 
-			// Extract natives
-			if (file.getString("destination").contains("natives")) {
-				JarInputStream inputStream = new JarInputStream(new FileInputStream(dlFile));
+			JarInputStream inputStream = new JarInputStream(new FileInputStream(dlFile));
+			System.out.println(dlFile.getAbsolutePath());
 
-				ZipEntry entry = inputStream.getNextEntry();
-				while (entry != null) {
-					if (entry.getName().endsWith(".so") || entry.getName().endsWith(".dll") || entry.getName().endsWith("lib")) {
-						FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/tmp/bin/natives/" + entry.getName());
-						IOUtils.copy(inputStream, outputStream);
-						outputStream.close();
-					}
-					entry = inputStream.getNextEntry();
+			ZipEntry entry = inputStream.getNextEntry();
+			while (entry != null) {
+				System.out.println(entry.getName());
+				if (!entry.getName().contains("META-INF")) {
+					System.out.println(Utils.getWorkingDir().toString() + "/tmp/" + file.getString("destination") + "/" + entry.getName());
+					FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/tmp/" + file.getString("destination") + "/" + entry.getName());
+					IOUtils.copy(inputStream, outputStream);
+					outputStream.close();
 				}
-				inputStream.close();
-				dlFile.delete();
+				entry = inputStream.getNextEntry();
 			}
+			inputStream.close();
+			dlFile.delete();
 		} else if (file.getString("mode").equalsIgnoreCase("jarupdate")) {
 			File dlFile = download.getOutFile();
 
