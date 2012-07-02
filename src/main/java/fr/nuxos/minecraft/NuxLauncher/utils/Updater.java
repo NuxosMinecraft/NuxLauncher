@@ -98,9 +98,16 @@ public class Updater implements Runnable {
 			ZipEntry entry = inputStream.getNextEntry();
 			while (entry != null) {
 				if (!entry.getName().contains("META-INF")) {
-					FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/tmp/" + file.getString("destination") + "/" + entry.getName());
-					IOUtils.copy(inputStream, outputStream);
-					outputStream.close();
+					if (entry.isDirectory()) {
+						File dir = new File(Utils.getWorkingDir().toString() + "/tmp/" + file.getString("destination") + "/" + entry.getName());
+						if (!dir.exists()) {
+							dir.mkdirs();
+						}
+					} else {
+						FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/tmp/" + file.getString("destination") + "/" + entry.getName());
+						IOUtils.copy(inputStream, outputStream);
+						outputStream.close();
+					}
 				}
 				entry = inputStream.getNextEntry();
 			}

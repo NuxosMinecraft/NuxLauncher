@@ -107,7 +107,7 @@ public class DownloadsManager {
 		for (File file : modsDir.listFiles()) {
 			if (file.isDirectory()) {
 				try {
-					FileUtils.moveDirectoryToDirectory(file, tmpDir, true);
+					FileUtils.copyDirectoryToDirectory(file, tmpDir);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
