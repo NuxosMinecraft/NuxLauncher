@@ -28,6 +28,8 @@ public class DownloadsManager {
 	}
 
 	public void startDownloads() {
+		saveModsConfig();
+
 		iterator = downloadsList.listIterator();
 		startNextDownload();
 	}
@@ -94,6 +96,21 @@ public class DownloadsManager {
 				// should only have bin dir and mods dir to move
 				FileUtils.deleteQuietly(file);
 				FileUtils.deleteQuietly(dest);
+			}
+		}
+	}
+
+	private void saveModsConfig() {
+		File tmpDir = new File(Utils.getWorkingDir().toString() + "/tmp/mods/");
+		File modsDir = new File(Utils.getWorkingDir().toString() + "/mods/");
+
+		for (File file : modsDir.listFiles()) {
+			if (file.isDirectory()) {
+				try {
+					FileUtils.moveDirectoryToDirectory(file, tmpDir, true);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

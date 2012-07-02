@@ -94,13 +94,10 @@ public class Updater implements Runnable {
 			File dlFile = download.getOutFile();
 
 			JarInputStream inputStream = new JarInputStream(new FileInputStream(dlFile));
-			System.out.println(dlFile.getAbsolutePath());
 
 			ZipEntry entry = inputStream.getNextEntry();
 			while (entry != null) {
-				System.out.println(entry.getName());
 				if (!entry.getName().contains("META-INF")) {
-					System.out.println(Utils.getWorkingDir().toString() + "/tmp/" + file.getString("destination") + "/" + entry.getName());
 					FileOutputStream outputStream = new FileOutputStream(Utils.getWorkingDir().toString() + "/tmp/" + file.getString("destination") + "/" + entry.getName());
 					IOUtils.copy(inputStream, outputStream);
 					outputStream.close();
