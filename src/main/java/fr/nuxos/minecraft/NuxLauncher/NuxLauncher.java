@@ -1,6 +1,9 @@
 package fr.nuxos.minecraft.NuxLauncher;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 
 import fr.nuxos.minecraft.NuxLauncher.console.ConsolePerformer;
 import fr.nuxos.minecraft.NuxLauncher.exceptions.InvalidLauncherModeException;
@@ -26,16 +29,7 @@ public class NuxLauncher {
 			config = new YAMLProcessor(configFile, false, YAMLFormat.EXTENDED);
 			config.load();
 
-			File repoFile = new File(Utils.getWorkingDir(), "repo.yml");
-			Downloader repoDL = new Downloader("http://launcher.nuxos-minecraft.fr/repo.yml", repoFile.getAbsolutePath());
-			repoDL.start();
-
-			if (!repoFile.exists()) {
-				repoFile.createNewFile();
-			}
-
-			repo = new YAMLProcessor(repoFile, false, YAMLFormat.EXTENDED);
-			repo.load();
+			downloadRepo();
 
 			if (Mode.equals("console")) {
 				new ConsolePerformer(this);
@@ -52,6 +46,32 @@ public class NuxLauncher {
 
 	public Integer getMinecraftLauncherVersion() {
 		return minecraftLauncherVersion;
+	}
+
+	public static void downloadRepo() {
+		try {
+			File repoFile = new File(Utils.getWorkingDir(), "repo.yml");
+			Downloader repoDL;
+			if (config.getBoolean("testrepo", false)) {
+				repoDL = new Downloader("http://launcher.nuxos-minecraft.fr/repo-test.yml", repoFile.getAbsolutePath());
+			} else {
+				repoDL = new Downloader("http://launcher.nuxos-minecraft.fr/repo.yml", repoFile.getAbsolutePath());
+			}
+			repoDL.start();
+
+			if (!repoFile.exists()) {
+				repoFile.createNewFile();
+			}
+
+			repo = new YAMLProcessor(repoFile, false, YAMLFormat.EXTENDED);
+			repo.load();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static YAMLProcessor getConfig() {

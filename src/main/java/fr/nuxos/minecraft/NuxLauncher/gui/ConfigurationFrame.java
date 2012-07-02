@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -30,9 +31,8 @@ public class ConfigurationFrame extends JFrame {
 	private JButton saveButton;
 	private JButton cancelButton;
 	private JToggleButton forceUpdateButton;
+	private JToggleButton testRepoButton;
 	private Hashtable<String, Object[]> optionalList;
-	private boolean forceUpdate;
-	private boolean modsUpdate;
 
 	private ConfigurationFrame() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -65,18 +65,19 @@ public class ConfigurationFrame extends JFrame {
 		saveButton.setEnabled(false);
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (forceUpdate || modsUpdate) {
-					YAMLProcessor config = NuxLauncher.getConfig();
-					config.removeProperty("optional");
+				YAMLProcessor config = NuxLauncher.getConfig();
+				config.removeProperty("optional");
 
-					Enumeration<Object[]> e = optionalList.elements();
-					while (e.hasMoreElements()) {
-						Object[] current = e.nextElement();
-						config.setProperty("optional." + (String) current[1] + ".enabled", data.elementAt((Integer) current[0]).elementAt(3));
-					}
-					config.setProperty("repository.version", 0);
-					config.save();
+				Enumeration<Object[]> e = optionalList.elements();
+				while (e.hasMoreElements()) {
+					Object[] current = e.nextElement();
+					config.setProperty("optional." + (String) current[1] + ".enabled", data.elementAt((Integer) current[0]).elementAt(3));
 				}
+				config.setProperty("testrepo", testRepoButton.isSelected());
+				config.setProperty("repository.version", 0);
+				config.save();
+
+				NuxLauncher.downloadRepo();
 
 				frame.dispose();
 			}
@@ -92,14 +93,25 @@ public class ConfigurationFrame extends JFrame {
 		forceUpdateButton = new JToggleButton("Forcer la mise à jour");
 		forceUpdateButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				forceUpdate = forceUpdateButton.isEnabled();
 				saveButton.setEnabled(true);
+			}
+		});
+
+		YAMLProcessor config = NuxLauncher.getConfig();
+		testRepoButton = new JToggleButton("Utiliser le dépôt de test");
+		testRepoButton.setSelected(config.getBoolean("testrepo", false));
+		testRepoButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				saveButton.setEnabled(true);
+
+				JOptionPane.showMessageDialog(frame, "Sauvez le configuration et revenez dedans pour voir les nouveaux mods.\n\nN'utilisez ce dépôt seulement aux fins de test et si vous savez ce que vous faîtes.", "Configuration - Dépôt de test", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 
 		buttonsPanel.add(saveButton);
 		buttonsPanel.add(cancelButton);
 		buttonsPanel.add(forceUpdateButton);
+		buttonsPanel.add(testRepoButton);
 
 		this.getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
 		this.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
@@ -184,11 +196,9 @@ public class ConfigurationFrame extends JFrame {
 				if (table.getValueAt(row, column).toString().equalsIgnoreCase("true")) {
 					aValue = new Boolean(false);
 					saveButton.setEnabled(true);
-					modsUpdate = true;
 				} else if (table.getValueAt(row, column).toString().equalsIgnoreCase("false")) {
 					aValue = new Boolean(true);
 					saveButton.setEnabled(true);
-					modsUpdate = true;
 				}
 			}
 
