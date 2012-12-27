@@ -213,7 +213,7 @@ public class MainFrame extends JFrame {
 			backgroundLabel.setForeground(Color.WHITE);
 			
 			Random r = new Random();
-			int intScreen = 1 + r.nextInt(5 - 1);
+			int intScreen = 1 + r.nextInt(5);
 					
 			backgroundLabel.setIcon(new ImageIcon(MainFrame.class.getResource("/gui/bg" + intScreen + ".jpg")));
 			backgroundLabel.setBounds(0, 0, 854, 480);
