@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.Random;
 
 import javax.crypto.Cipher;
@@ -30,19 +32,25 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
+import fr.nuxos.minecraft.NuxLauncher.NuxLauncher;
 import fr.nuxos.minecraft.NuxLauncher.utils.Utils;
 
 public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 8717494428368790716L;
+	
 	// declarations
 	private GuiPerformer performer;
+	private NuxLauncher launcher;
 
 	// GUI elements
 	private static JPanel contentPane;
-	private static JPanel newsPane;
 	private static JLabel backgroundLabel;
 	private static JLabel titleLabel;
 	private static JLabel descriptionLabel;
@@ -55,14 +63,16 @@ public class MainFrame extends JFrame {
 	private static JCheckBox rememberCheckBox;
 	private static JLabel statusLabel;
 	private static JProgressBar statusPbar;
-	private static JLabel titleNewsLabel;
+	private static JScrollPane scrollPane;
+	private static JTextPane textPane;
 
 	private static boolean isLogged = false;
 
-	public MainFrame(GuiPerformer performer) {
+	public MainFrame(GuiPerformer performer, NuxLauncher launcher) {
 		this.performer = performer;
+		this.launcher = launcher;
 
-		setTitle("Nuxos Launcher v.indev");
+		setTitle("Nuxos Launcher v. " + launcher.getNuxLauncherVersion());
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -92,14 +102,21 @@ public class MainFrame extends JFrame {
 			contentPane.setBorder(null);
 			contentPane.setLayout(null);
 
-			newsPane = new JPanel();
-			newsPane.setBounds(0, 0, 350, 480);
-			newsPane.setBackground(new Color(255, 255, 255, 50));
-
-			contentPane.add(newsPane);
 			getContentPane().add(contentPane);
+			
+			textPane = new JTextPane();
+		    textPane.setEditable(false);
+		    textPane.setMargin(null);
+		    textPane.setBackground(new Color(255, 255, 255, 20));
+		    textPane.setContentType("text/html");
+		    textPane.addHyperlinkListener(EXTERNAL_HYPERLINK_LISTENER);
+			
+			scrollPane = new JScrollPane(textPane);
+			scrollPane.setBounds(0, 0, 350, 480);
+			scrollPane.setBackground(new Color(255, 255, 255, 50));
+			scrollPane.setBorder(null);
+			contentPane.add(scrollPane);
 
-			// contentPane elements
 			titleLabel = new JLabel("Nuxos Minecraft");
 			titleLabel.setForeground(Color.WHITE);
 			titleLabel.setBounds(600, 168, 316, 38);
@@ -144,7 +161,6 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(ActionEvent arg0) {
 					if (isLogged == false) {
 						if (passField.getText().isEmpty() || userField.getText().isEmpty()) {
-							// set status "retry", removed ( useless )
 						} else {
 							performer.doLogin();
 						}
@@ -195,20 +211,17 @@ public class MainFrame extends JFrame {
 
 			backgroundLabel = new JLabel("");
 			backgroundLabel.setForeground(Color.WHITE);
-			backgroundLabel.setIcon(new ImageIcon(MainFrame.class.getResource("/gui/bg.png")));
+			
+			Random r = new Random();
+			int intScreen = 1 + r.nextInt(5 - 1);
+					
+			backgroundLabel.setIcon(new ImageIcon(MainFrame.class.getResource("/gui/bg" + intScreen + ".jpg")));
 			backgroundLabel.setBounds(0, 0, 854, 480);
 			contentPane.add(backgroundLabel);
 
-			// newsPane elements
-			titleNewsLabel = new JLabel();
-			titleNewsLabel.setText("News");
-			// titleNews.setBounds(20, 220, 50, 20);
-			titleNewsLabel.setForeground(Color.WHITE);
-			titleNewsLabel.setFont(new java.awt.Font("Bitstream Charter", 0, 22));
-
-			newsPane.add(titleNewsLabel);
-
 			readRemember();
+			updateNews();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -216,6 +229,43 @@ public class MainFrame extends JFrame {
 
 		return true;
 
+	}
+	
+	private void updateNews() {
+		new Thread()
+	      {
+	        public void run() {
+	          try {
+	            textPane.setPage(new URL("http://launcher.nuxos-minecraft.fr/news/index.php"));
+	          } catch (Exception localException) {
+	            localException.printStackTrace();
+	            textPane.setText("<html><body><font color=\"white\"><br><br><br><br><br><br><br><center><h2>Erreur de connexion.</h2><br>" + localException.toString() + "</center></font></body></html>");
+	          }
+	        }
+	      }
+	      .start();
+	}
+
+	// thanks to mojang ...
+	private static final HyperlinkListener EXTERNAL_HYPERLINK_LISTENER = new HyperlinkListener() {
+		public void hyperlinkUpdate(HyperlinkEvent paramAnonymousHyperlinkEvent) {
+			if (paramAnonymousHyperlinkEvent.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
+				try {
+					openLink(paramAnonymousHyperlinkEvent.getURL().toURI());
+				} catch (Exception localException) {
+					localException.printStackTrace();
+				}
+		}
+	};
+
+	// thanks to mojang 2 ...
+	private static void openLink(URI paramURI) {
+		try {
+			Object localObject = Class.forName("java.awt.Desktop").getMethod("getDesktop", new Class[0]).invoke(null, new Object[0]);
+			localObject.getClass().getMethod("browse", new Class[] { URI.class }).invoke(localObject, new Object[] { paramURI });
+		} catch (Throwable localThrowable) {
+			System.out.println("Failed to open link " + paramURI.toString());
+		}
 	}
 
 	public void setStatus(String status) {

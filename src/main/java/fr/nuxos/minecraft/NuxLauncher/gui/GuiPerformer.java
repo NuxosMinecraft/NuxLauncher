@@ -15,14 +15,13 @@ public class GuiPerformer implements Performer {
 	// Main
 	MainFrame mainWindow;
 	NuxLauncher launcher;
+	
 	// Minecraft
     Hashtable<String, String> loggingInfo;
 
 	public GuiPerformer(NuxLauncher MainLauncher) {
-		// Loading main classes
 		launcher = MainLauncher;
-		mainWindow = new MainFrame(this);
-		//logger = new MinecraftLogin(launcher, this);
+		mainWindow = new MainFrame(this, launcher);
 	}
 
 	public void doLogin() {

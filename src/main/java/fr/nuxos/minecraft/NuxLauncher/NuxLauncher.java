@@ -15,7 +15,7 @@ import fr.nuxos.minecraft.NuxLauncher.yml.YAMLProcessor;
 
 public class NuxLauncher {
 
-	static String nuxLauncherVersion = "indev";
+	static Integer nuxLauncherVersion = 1;
 	static Integer minecraftLauncherVersion = 13;
 	static YAMLProcessor config;
 	static YAMLProcessor repo;
@@ -46,6 +46,10 @@ public class NuxLauncher {
 
 	public Integer getMinecraftLauncherVersion() {
 		return minecraftLauncherVersion;
+	}
+	
+	public Integer getNuxLauncherVersion() {
+		return nuxLauncherVersion;
 	}
 
 	public static void downloadRepo() {
