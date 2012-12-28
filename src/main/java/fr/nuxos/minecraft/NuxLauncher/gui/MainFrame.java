@@ -153,7 +153,7 @@ public class MainFrame extends JFrame {
 			contentPane.add(passField);
 
 			playButton = new JButton("Login");
-			playButton.setToolTipText("Connexion et lancement du jeu. La connexion est faite directement auprès des serveurs de minecraft.net, et est sécurisé ( SSL ). En aucun cas le launcher ne récupère ces informations pour les transmettre à un tiers.");
+			playButton.setToolTipText("Connexion (SSL) et lancement du jeu");
 			playButton.setBounds(630, 418, 211, 30);
 
 			playButton.addActionListener(new ActionListener() {
@@ -175,7 +175,7 @@ public class MainFrame extends JFrame {
 
 			optionsButton = new JButton("");
 			optionsButton.setIcon(new ImageIcon(MainFrame.class.getResource("/gui/cog.png")));
-			optionsButton.setToolTipText("Connexion et lancement du jeu. La connexion est faite directement auprès des serveurs de minecraft.net, et est sécurisé ( SSL ). En aucun cas le launcher ne récupère ces informations pour les transmettre à un tiers.");
+			optionsButton.setToolTipText("Gestion des dépôts");
 			optionsButton.setBounds(596, 418, 30, 30);
 
 			optionsButton.addActionListener(new ActionListener() {
@@ -188,7 +188,7 @@ public class MainFrame extends JFrame {
 
 			rememberCheckBox = new JCheckBox();
 			rememberCheckBox.setText("Remember");
-			rememberCheckBox.setToolTipText("Mémoriser votre nom d'utilisateur et votre mot de passe pour la prochaine connexion.");
+			rememberCheckBox.setToolTipText("Mémorise les identifiants");
 			rememberCheckBox.setBounds(730, 390, 111, 19);
 			rememberCheckBox.setOpaque(false);
 			rememberCheckBox.setForeground(Color.WHITE);
@@ -213,9 +213,9 @@ public class MainFrame extends JFrame {
 			backgroundLabel.setForeground(Color.WHITE);
 			
 			Random r = new Random();
-			int intScreen = 1 + r.nextInt(5);
+			int intScreen = 1 + r.nextInt(4);
 					
-			backgroundLabel.setIcon(new ImageIcon(MainFrame.class.getResource("/gui/bg" + intScreen + ".jpg")));
+			backgroundLabel.setIcon(new ImageIcon(MainFrame.class.getResource("/gui/bg" + intScreen + ".png")));
 			backgroundLabel.setBounds(0, 0, 854, 480);
 			contentPane.add(backgroundLabel);
 
