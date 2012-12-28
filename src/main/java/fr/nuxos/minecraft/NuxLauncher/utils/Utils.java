@@ -64,10 +64,12 @@ public class Utils {
 		dirList.add(new File(workingDirectory, "bin/"));
 		dirList.add(new File(workingDirectory, "bin/natives/"));
 		dirList.add(new File(workingDirectory, "mods/"));
+		dirList.add(new File(workingDirectory, "texturepacks/"));
 		dirList.add(new File(workingDirectory, "tmp/"));
 		dirList.add(new File(workingDirectory, "tmp/bin/"));
 		dirList.add(new File(workingDirectory, "tmp/bin/natives/"));
 		dirList.add(new File(workingDirectory, "tmp/mods/"));
+		dirList.add(new File(workingDirectory, "tmp/texturepacks/"));
 		
 		for(File dir : dirList) {
 			if (!dir.exists()) {
