@@ -23,7 +23,6 @@ public class ConsolePerformer implements Performer {
 	}
 
 	public void doLogin() {
-
 		mainConsole.Log("Username :");
 		String username = mainConsole.GetInput();
 		mainConsole.Log("Password :");
@@ -34,8 +33,14 @@ public class ConsolePerformer implements Performer {
 	}
 
 	public void doUpdate() {
-		Thread t = new Thread(new Updater(this)); //TODO: handle download errors
-		t.start();
+		Updater updater = new Updater(this);
+		if(updater.checkForUpdate()) {
+			mainConsole.Log("Updating ...");
+			Thread t = new Thread(new Updater(this));
+			t.start();
+		} else {
+			downloadsFinished();
+		}
 	}
 
 	public void doLaunchMinecraft() {
