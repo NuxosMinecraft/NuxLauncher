@@ -1,6 +1,7 @@
 package fr.nuxos.minecraft.NuxLauncher.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class Utils {
@@ -53,6 +54,13 @@ public class Utils {
 			operatingSystem = OS.LINUX;
 			operatingSystemName = "linux";
 			workingDirectory = new File(userHome, '.' + applicationName);
+		}
+
+		try {
+			String wdp = workingDirectory.getCanonicalPath();
+			System.setProperty("minecraft.applet.TargetDirectory", wdp);
+		} catch (IOException e) {			
+			e.printStackTrace();
 		}
 
 		// Create basic dirs

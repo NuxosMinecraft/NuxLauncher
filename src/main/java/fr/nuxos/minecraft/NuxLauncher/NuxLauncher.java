@@ -13,6 +13,8 @@ import fr.nuxos.minecraft.NuxLauncher.utils.Utils;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLFormat;
 import fr.nuxos.minecraft.NuxLauncher.yml.YAMLProcessor;
 
+import fr.nuxos.minecraft.NuxLauncher.launch.GameApplet;
+
 public class NuxLauncher {
 
 	static Integer nuxLauncherVersion = 1;
@@ -21,6 +23,10 @@ public class NuxLauncher {
 	static YAMLProcessor repo;
 
 	public NuxLauncher(String Mode) {
+		
+		// necessary for minecraft forge
+        System.setProperty("minecraft.applet.WrapperClass", GameApplet.class.getCanonicalName());
+
 		try {
 			File configFile = new File(Utils.getWorkingDir(), "config.yml");
 			if (!configFile.exists()) {

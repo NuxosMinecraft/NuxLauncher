@@ -71,5 +71,19 @@ public class GameApplet extends Applet implements AppletStub {
 	public void appletResize(int width, int height) {
 
 	}
+	
+	public void replace(Applet applet) {
+        this.applet = applet;
+        applet.setStub(this);
+        applet.setSize(getWidth(), getHeight());
+        
+        setLayout(new BorderLayout());
+        add(applet, "Center");
+        
+        applet.init();
+        active = true;
+        applet.start();
+        validate();
+    }
 
 }
