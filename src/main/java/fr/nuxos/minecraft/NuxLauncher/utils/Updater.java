@@ -89,7 +89,34 @@ public class Updater implements Runnable {
 		YAMLNode file = repo.getNode(download.getDownloadId());
 
 		if (file.getString("mode").equalsIgnoreCase("copy")) {
-			// Nothing to do
+			
+			if(file.getString("name").equalsIgnoreCase("minecraft")) {
+				// cleaning META-INF folder
+				File dlFile = download.getOutFile();
+				JarInputStream inputStream = new JarInputStream(new FileInputStream(dlFile));
+				ZipEntry entry = inputStream.getNextEntry();
+				
+				File newFile = new File(dlFile.getAbsolutePath() + ".patched");
+				JarOutputStream outputStream = new JarOutputStream(new FileOutputStream(newFile));
+
+				while (entry != null) {
+					if (!entry.getName().contains("META-INF")) {
+						outputStream.putNextEntry(new ZipEntry(entry.getName()));						
+		                int len;
+		                byte[] buf = new byte[1024];
+		                
+		                while ((len = inputStream.read(buf)) > 0) {
+		                    outputStream.write(buf, 0, len);
+		                }
+					}
+					entry = inputStream.getNextEntry();
+				}
+				inputStream.close();
+				outputStream.close();
+				dlFile.delete();
+				newFile.renameTo(dlFile);
+			}
+			
 		} else if (file.getString("mode").equalsIgnoreCase("extract")) {
 			File dlFile = download.getOutFile();
 
